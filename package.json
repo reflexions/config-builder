@@ -1,0 +1,42 @@
+{
+	"name": "@reflexions/config-builder",
+	"version": "1.0.0",
+	"description": "Calls plugins to generate and run a config",
+	"exports": {
+		".": "./ConfigBuilder.mjs",
+		"./plugin-sets/*.mjs": "./plugin-sets/*.mjs",
+		"./plugins/hmr/HmrClient.mjs": "./plugins/hmr/HmrClient.mjs",
+		"./plugins/hmr/HmrServer.mjs": "./plugins/hmr/HmrServer.mjs",
+		"./plugins/file-types/*.mjs": "./plugins/file-types/*.mjs",
+		"./plugins/hooks/*.mjs": "./plugins/hooks/*.mjs",
+		"./plugins/context-providers/*/*.mjs": "./plugins/context-providers/*/*.mjs",
+		"./plugins/webpack/*.mjs": "./plugins/webpack/*.mjs",
+		"./plugins/webpack/webpack-plugins/*.mjs": "./plugins/webpack/webpack-plugins/*.mjs",
+		"./BreadcrumbContext.mjs": "./BreadcrumbContext.mjs",
+		"./ConfigBuilder.mjs": "./ConfigBuilder.mjs",
+		"./PluginSchema.mjs": "./PluginSchema.mjs",
+		"./RunPlugins.mjs": "./RunPlugins.mjs",
+		"./AvailableHooksContext.mjs": "./AvailableHooksContext.mjs"
+	},
+	"keywords": [],
+	"author": "Reflexions Data, LLC",
+	"license": "ISC",
+	"peerDependencies": {
+		"@reflexions/string-to-boolean": "^1.0.0",
+		"autoprefixer": "^10.4.16",
+		"chalk": "^5.3.0",
+		"copy-webpack-plugin": "^11.0.0",
+		"mini-css-extract-plugin": "^2.7.6",
+		"postcss-custom-media": "^10.0.2",
+		"postcss-nesting": "^12.0.1",
+		"postcss-reporter": "^7.0.5",
+		"react-dev-utils": "^12.0.1",
+		"react-error-overlay": "^6.0.11",
+		"schema-utils": "^4.2.0",
+		"strip-ansi": "^7.1.0",
+		"webpack": "^5.89.0",
+		"webpack-assets-manifest": "^5.1.0",
+		"webpack-dev-server": "^4.15.1"
+	},
+	"type": "module"
+}
