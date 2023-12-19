@@ -7,29 +7,30 @@ const pluginName = "WaitForAssetsPlugin";
 const waitForAssetsJson = async () => {
 	let attempts = 0;
 	let done = false;
+	const retryTime = 1_000;
 	await new Promise(async (resolve, reject) => {
-		attempts++;
 		const browserAssetsJson = getAppAssetsManifest();
 		do {
+			attempts++;
 			try {
 				await access(browserAssetsJson, constants.R_OK);
 				console.log(browserAssetsJson, await readFile(browserAssetsJson, 'utf8'));
 
-				console.log(`${pluginName} done waiting`);
 				done = true;
 				resolve();
 			}
 			catch (error) {
 				if (attempts > 300) {
+					console.error(`${pluginName} gave up waiting`);
 					console.error(error);
 					done = true;
 					reject();
 				}
 				else {
-					if (attempts > 60) {
-						console.info(`waiting for ${browserAssetsJson} from client build`);
+					if (attempts % 10 === 0) {
+						console.info(`Waited ${attempts * retryTime / 1_000} sec for ${browserAssetsJson} from client build`);
 					}
-					await setTimeout(1_000);
+					await setTimeout(retryTime);
 				}
 			}
 		} while (!done)
@@ -81,8 +82,6 @@ export default class WaitForAssetsPlugin {
 					stage: Compilation.PROCESS_ASSETS_STAGE_SUMMARIZE,
 				},
 				async (assets) => {
-					console.log(`${pluginName} Tapped processAssets`);
-
 					// "assets" is an object that contains all assets
 					// in the compilation, the keys of the object are pathnames of the assets
 					// and the values are file sources.

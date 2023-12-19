@@ -85,6 +85,7 @@ const attachBaseWebpackConfigCrumb = Symbol("attachBaseWebpackConfig");
 const attachBaseWebpackConfig = async config => {
 	const isProduction = getIsProduction();
 	const isNode = getIsNode();
+
 	return ({
 		...config,
 		...await baseConfig({ isProduction, isNode }),

@@ -1,13 +1,13 @@
 import {
 	getIsProduction,
 	getShouldUseReactRefresh,
-} from "../context-providers/options/Options.mjs";
-import { getHookFn } from "../../RunPlugins.mjs";
-import { getIsNode } from "../webpack/SeparateNodeAndBrowserBuilds.mjs";
+} from "../../context-providers/options/Options.mjs";
+import { getHookFn } from "../../../RunPlugins.mjs";
+import { getIsNode } from "../SeparateNodeAndBrowserBuilds.mjs";
 import stringToBoolean from "@reflexions/string-to-boolean";
 import {
 	getTargetsHook,
-} from "../hooks/GetTargets.mjs";
+} from "../../hooks/GetTargets.mjs";
 
 
 

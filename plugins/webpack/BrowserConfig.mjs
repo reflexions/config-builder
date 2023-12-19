@@ -5,16 +5,12 @@ import {
 	getIsProduction,
 } from "../context-providers/options/Options.mjs";
 import {
-	getAppAssetsManifest,
 	getAppDir,
 	getAppDirBuild,
 	getAppSrcPublicDir,
 } from "../context-providers/paths/Paths.mjs";
 import CopyPlugin from 'copy-webpack-plugin';
 import { getHookFn } from "../../RunPlugins.mjs";
-import WebpackAssetsManifest from 'webpack-assets-manifest';
-import stringToBoolean from "@reflexions/string-to-boolean";
-import ClientDevServerPlugin from "./webpack-plugins/ClientDevServer.mjs";
 
 /* https://webpack.js.org/configuration/target/#target */
 export const getBrowserTargetHook = Symbol("getBrowserTargetHook");
@@ -29,8 +25,7 @@ const browserConfig = async ({ config, isProduction }) => {
 	const hasPublicDir = await access(getAppSrcPublicDir(), constants.R_OK)
 		.then(() => true)
 		.catch(() => false);
-	console.log("getAppSrcPublicDir()", getAppSrcPublicDir());
-	console.log("hasPublicDir", hasPublicDir);
+
 	return ({
 		...config,
 
@@ -75,24 +70,8 @@ const browserConfig = async ({ config, isProduction }) => {
 		},
 
 		plugins: [
-			...config.plugins,
+			...config.plugins ?? [],
 
-			// Output all files in a manifest file called assets-manifest.json
-			// in the build directory.
-			new WebpackAssetsManifest({
-				output: getAppAssetsManifest(),
-				writeToDisk: true,
-
-				// https://www.npmjs.com/package/webpack-assets-manifest#publicpath
-				// this will be the PORT+1 server for dev builds
-				publicPath: true,
-
-				// entryPoints: true
-
-				// dev builds spend a few hundred ms calculating the hashes if this is on
-				integrity: stringToBoolean(process.env.RESOURCE_INTEGRITY ?? isProduction),
-			}),
-			!isProduction && new ClientDevServerPlugin(),
 			hasPublicDir && new CopyPlugin({
 				patterns: [
 					{

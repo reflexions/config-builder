@@ -1,5 +1,5 @@
 #!/usr/bin/node
-import reactSsrPlugins from "./plugin-sets/ReactSsrPlugins.mjs";
+import reactSsrPlugins from "../plugin-sets/ReactSsrPlugin.mjs";
 import configBuilder from "./ConfigBuilder.mjs";
 
 const main = async () => {

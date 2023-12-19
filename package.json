@@ -2,25 +2,30 @@
 	"name": "@reflexions/config-builder",
 	"version": "1.0.0",
 	"description": "Calls plugins to generate and run a config",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/reflexions/config-builder.git"
+	},
 	"exports": {
 		".": "./ConfigBuilder.mjs",
 		"./plugin-sets/*.mjs": "./plugin-sets/*.mjs",
-		"./plugins/hmr/HmrClient.mjs": "./plugins/hmr/HmrClient.mjs",
-		"./plugins/hmr/HmrServer.mjs": "./plugins/hmr/HmrServer.mjs",
-		"./plugins/file-types/*.mjs": "./plugins/file-types/*.mjs",
 		"./plugins/hooks/*.mjs": "./plugins/hooks/*.mjs",
 		"./plugins/context-providers/*/*.mjs": "./plugins/context-providers/*/*.mjs",
 		"./plugins/webpack/*.mjs": "./plugins/webpack/*.mjs",
+		"./plugins/webpack/file-types/*.mjs": "./plugins/webpack/file-types/*.mjs",
+		"./plugins/webpack/hmr/HmrClient.mjs": "./plugins/hmr/HmrClient.mjs",
+		"./plugins/webpack/hmr/HmrServer.mjs": "./plugins/hmr/HmrServer.mjs",
 		"./plugins/webpack/webpack-plugins/*.mjs": "./plugins/webpack/webpack-plugins/*.mjs",
+		"./AvailableHooksContext.mjs": "./AvailableHooksContext.mjs",
 		"./BreadcrumbContext.mjs": "./BreadcrumbContext.mjs",
 		"./ConfigBuilder.mjs": "./ConfigBuilder.mjs",
 		"./PluginSchema.mjs": "./PluginSchema.mjs",
-		"./RunPlugins.mjs": "./RunPlugins.mjs",
-		"./AvailableHooksContext.mjs": "./AvailableHooksContext.mjs"
+		"./RunPlugins.mjs": "./RunPlugins.mjs"
 	},
 	"keywords": [],
 	"author": "Reflexions Data, LLC",
 	"license": "ISC",
+	"sideEffects": false,
 	"peerDependencies": {
 		"@reflexions/string-to-boolean": "^1.0.0",
 		"autoprefixer": "^10.4.16",
@@ -30,6 +35,7 @@
 		"postcss-custom-media": "^10.0.2",
 		"postcss-nesting": "^12.0.1",
 		"postcss-reporter": "^7.0.5",
+		"razzle-start-server-webpack-plugin": "^4.2.18",
 		"react-dev-utils": "^12.0.1",
 		"react-error-overlay": "^6.0.11",
 		"schema-utils": "^4.2.0",

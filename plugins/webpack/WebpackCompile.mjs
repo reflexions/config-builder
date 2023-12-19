@@ -1,7 +1,8 @@
-import webpack from "webpack";
+import webpackContext from "../context-providers/webpack/WebpackContext.mjs";
 
-const webpackCompile = async (config) => {
+const webpackCompile = (config) => {
 	return new Promise((resolve, reject) => {
+		const webpack = webpackContext.getStore();
 		webpack(config, (configError, stats) => {
 			// we get called each time a compilation finishes
 
@@ -19,18 +20,18 @@ const webpackCompile = async (config) => {
 			const info = stats.toJson();
 
 			if (stats.hasErrors()) {
-				console.error("stats.hasErrors()");
+				console.error("Webpack reported stats.hasErrors()");
 				console.error(info.errors);
-				reject({ type: "stats.hasErrors()", configError });
+				reject({ type: "webpack stats.hasErrors()", configError });
 				return;
 			}
 
 			if (stats.hasWarnings()) {
-				console.warn("stats.hasWarnings()");
+				console.warn("Webpack reported stats.hasWarnings()");
 				console.warn(info.warnings);
 			}
 
-			console.log("Done processing");
+			console.log("Webpack compiled successfully");
 			resolve();
 		})
 	});

@@ -1,5 +1,5 @@
-import { getIsProduction } from "../context-providers/options/Options.mjs";
-import { getIsNode } from "../webpack/SeparateNodeAndBrowserBuilds.mjs";
+import { getIsProduction } from "../../context-providers/options/Options.mjs";
+import { getIsNode } from "../SeparateNodeAndBrowserBuilds.mjs";
 
 const imageLoaderConfig = async ({ config, isProduction, isNode }) => {
 	return {

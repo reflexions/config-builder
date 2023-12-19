@@ -1,4 +1,4 @@
-import fsP from "node:fs/promises";
+import { writeFile } from "node:fs/promises";
 import { productionSymbol } from "../context-providers/options/Options.mjs";
 import optionsContext from "../context-providers/options/OptionsContext.mjs";
 
@@ -36,7 +36,7 @@ const sortKeys = obj => {
 	return obj;
 };
 
-const logConfigPlugin = async (config) => {
+const logConfigPlugin = async (basePath, config) => {
 	const prodOrDev = optionsContext.getStore().get(productionSymbol)
 		? 'prod'
 		: 'dev';
@@ -46,8 +46,8 @@ const logConfigPlugin = async (config) => {
 		value: RegExp.prototype.toString,
 	});
 
-	await fsP.writeFile(`../webpack-eject/ours/client-${prodOrDev}.config.json`, JSON.stringify(config[ 0 ], jsonStringifyToObjectReplacer, '\t'));
-	await fsP.writeFile(`../webpack-eject/ours/server-${prodOrDev}.config.json`, JSON.stringify(config[ 1 ], jsonStringifyToObjectReplacer, '\t'));
+	await writeFile(`${basePath}/client-${prodOrDev}.config.json`, JSON.stringify(config[ 0 ], jsonStringifyToObjectReplacer, '\t'));
+	await writeFile(`${basePath}/server-${prodOrDev}.config.json`, JSON.stringify(config[ 1 ], jsonStringifyToObjectReplacer, '\t'));
 
 	console.info(JSON.stringify({ config }, jsonStringifyToObjectReplacer, '\t'));
 
@@ -56,8 +56,10 @@ const logConfigPlugin = async (config) => {
 
 const logConfigCrumb = Symbol(logConfigPlugin.name);
 
-export default {
+const getPlugin = (basePath) => ({
 	name: logConfigPlugin.name,
-	main: (config) => logConfigPlugin(config),
 	crumb: logConfigCrumb,
-};
+	main: (config) => logConfigPlugin(basePath, config),
+});
+
+export default getPlugin;

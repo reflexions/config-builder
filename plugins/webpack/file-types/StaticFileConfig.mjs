@@ -1,5 +1,5 @@
-import { getIsProduction } from "../context-providers/options/Options.mjs";
-import { getIsNode } from "../webpack/SeparateNodeAndBrowserBuilds.mjs";
+import { getIsProduction } from "../../context-providers/options/Options.mjs";
+import { getIsNode } from "../SeparateNodeAndBrowserBuilds.mjs";
 
 const staticFileConfig = async ({ config, isProduction, isNode }) => {
 	return {
@@ -32,16 +32,22 @@ const staticFileConfig = async ({ config, isProduction, isNode }) => {
 						/\.png$/,
 						/\.cjs/,
 					],
-					use: [
-						{
-							ident: "static-file-loader",
-							loader: "file-loader",
-							options: {
-								emitFile: !isNode,
-								name: "static/media/[name].[contenthash:8].[ext]",
-							},
-						},
-					],
+					// use: [
+					// 	{
+					// 		ident: "static-file-loader",
+					// 		loader: "file-loader",
+					// 		options: {
+					// 			emitFile: !isNode,
+					// 			name: "static/media/[name].[contenthash:8].[ext]",
+					// 		},
+					// 	},
+					// ],
+
+					type: 'asset/resource',
+					generator: {
+						filename: "static/media/[name].[contenthash:8][ext]",
+						emit: !isNode,
+					},
 				},
 			],
 		},

@@ -1,4 +1,7 @@
-import { getIsProduction } from "../context-providers/options/Options.mjs";
+import {
+	getHmrClientPublicUrl,
+	getIsProduction,
+} from "../context-providers/options/Options.mjs";
 import { getHookFn } from "../../RunPlugins.mjs";
 import WaitForAssetsPlugin from "./webpack-plugins/WaitForAssetsPlugin.mjs";
 
@@ -44,7 +47,10 @@ const nodeConfig = async ({ config, isProduction }) => ({
 		...config.output,
 
 		path: "/var/www/html/build",
-		publicPath: '/',
+		//publicPath: '/',
+		publicPath: isProduction
+			? '/'
+			: getHmrClientPublicUrl().href,
 
 		filename: await getHookFn(getNodeOutputFilenameHook, () => `[name].${isProduction
 			? '[contenthash:8].'
@@ -80,7 +86,7 @@ const nodeConfig = async ({ config, isProduction }) => ({
 	},
 
 	plugins: [
-		...config.plugins,
+		...config.plugins ?? [],
 
 		new WaitForAssetsPlugin(),
 	],

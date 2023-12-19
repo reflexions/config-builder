@@ -4,7 +4,7 @@ import optionsContext from "../context-providers/options/OptionsContext.mjs";
 import {
 	hasBrowserBuildSymbol,
 	hasNodeBuildSymbol,
-} from "../../CompilationReport.mjs";
+} from "../context-providers/compilation-report/CompilationReport.mjs";
 
 
 

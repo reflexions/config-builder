@@ -1,14 +1,14 @@
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import {
 	getIsProduction,
-} from "../context-providers/options/Options.mjs";
-import { getIsNode } from "../webpack/SeparateNodeAndBrowserBuilds.mjs";
+} from "../../context-providers/options/Options.mjs";
+import { getIsNode } from "../SeparateNodeAndBrowserBuilds.mjs";
 import postcssNesting from "postcss-nesting";
 import postcssReporter from 'postcss-reporter';
 import postcssCustomMedia from 'postcss-custom-media';
 import autoprefixer from "autoprefixer";
-import { getHookFn } from "../../RunPlugins.mjs";
-import { getTargetsHook } from "../hooks/GetTargets.mjs";
+import { getHookFn } from "../../../RunPlugins.mjs";
+import { getTargetsHook } from "../../hooks/GetTargets.mjs";
 
 const cssConfig = async ({ config, isProduction, isNode }) => {
 
@@ -17,23 +17,19 @@ const cssConfig = async ({ config, isProduction, isNode }) => {
 	// but we're not doing that here, so only need it on client build
 	const usePostcss = !isNode;
 
-	const old_browser_compat = true;
+	const old_browser_compat = isProduction;
 
 	return ({
 		...config,
 
-		...(!isNode && isProduction
-				? {
-					plugins: [
-						...config.plugins ?? [],
-						new MiniCssExtractPlugin({
-							"chunkFilename": "static/css/[name].[contenthash:8].chunk.css",
-							"filename": "static/css/[name].[contenthash:8].css",
-						}),
-					],
-				}
-				: {}
-		),
+		plugins: [
+			...config.plugins ?? [],
+
+			!isNode && isProduction && new MiniCssExtractPlugin({
+				"chunkFilename": "static/css/[name].[contenthash:8].chunk.css",
+				"filename": "static/css/[name].[contenthash:8].css",
+			}),
+		].filter(x => x),
 
 		module: {
 			...config.module,
