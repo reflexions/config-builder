@@ -25,6 +25,7 @@ const baseConfig = async ({ isProduction, isNode }) => ({
 	devtool: await getHookFn(getDevToolHook, () => isProduction ? "source-map" : "eval-cheap-module-source-map"),
 	output: {
 		pathinfo: false,
+		hashFunction: 'xxhash64',
 		crossOriginLoading: await getHookFn(getCrossOriginLoadingHook, () => isProduction ? undefined : "anonymous"),
 	},
 	profile,

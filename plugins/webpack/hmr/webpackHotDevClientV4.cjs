@@ -12,18 +12,19 @@
 // This was done to avoid getting a warning about the `createSocketURL` vs `createSocketUrl` file names
 // You must keep the code in these two files in sync
 
-import stripAnsi from "strip-ansi";
-import launchEditorEndpoint from "react-dev-utils/launchEditorEndpoint.js";
-import formatWebpackMessages from "./formatWebpackMessages.mjs";
+// note that Webpack doesn't support HMR for modules yet, so this file is cjs
+const stripAnsi = require("strip-ansi");
+const launchEditorEndpoint = require("react-dev-utils/launchEditorEndpoint.js");
+const formatWebpackMessages = require("./formatWebpackMessages.mjs");
 
-import ErrorOverlay from "react-error-overlay";
+const ErrorOverlay = require("react-error-overlay");
 //--- START Unique code ---
 // This code is unique to webpack-dev-server v4
 // The single API changed to 2 APIs in v4, first you parse the URL, then you create the socket URL from the parsed data
 // These APIs are accessible from the `default` context
-import parseURL from "webpack-dev-server/client/utils/parseURL.js";
+const parseURL = require("webpack-dev-server/client/utils/parseURL").default;
 
-import createSocketURL from "webpack-dev-server/client/utils/createSocketURL.js";
+const createSocketURL = require("webpack-dev-server/client/utils/createSocketURL").default;
 
 console.log("Hi from webpackHotDevClientV4");
 
@@ -31,7 +32,9 @@ const socketUrl = createSocketURL(parseURL());
 
 const parsedSocketUrl = new URL(socketUrl);
 
-const hotness = import.meta.webpackHot ?? (typeof module !== "undefined" ? module.hot : null);
+//const hotness = import.meta; // if using esmodules
+const hotness = module.hot; // if using commonjs
+console.log("hotness", hotness);
 
 if (hotness) {
 	ErrorOverlay.setEditorHandler(function editorHandler(errorLocation) {

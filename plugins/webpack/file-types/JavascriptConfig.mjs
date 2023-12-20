@@ -118,7 +118,9 @@ const javascriptConfig = async ({ config, isProduction, isNode }) => {
 				...config.module?.rules ?? [],
 
 				{
-					exclude: /node_modules/,
+					exclude: [
+						/node_modules/,
+					],
 					include: [
 						"/var/www/html/src",
 					],

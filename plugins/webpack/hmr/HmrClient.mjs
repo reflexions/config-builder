@@ -60,7 +60,7 @@ const attachHmrClient = async config => {
 			...config.entry,
 
 			client: [
-				getConfigBuilderDir() + '/plugins/webpack/hmr/webpackHotDevClientV4.mjs',
+				getConfigBuilderDir() + '/plugins/webpack/hmr/webpackHotDevClientV4.cjs',
 				...config.entry.client,
 			],
 		},
