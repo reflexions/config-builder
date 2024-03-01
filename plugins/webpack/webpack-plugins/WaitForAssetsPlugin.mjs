@@ -14,7 +14,6 @@ const waitForAssetsJson = async () => {
 			attempts++;
 			try {
 				await access(browserAssetsJson, constants.R_OK);
-				console.log(browserAssetsJson, await readFile(browserAssetsJson, 'utf8'));
 
 				done = true;
 				resolve();
