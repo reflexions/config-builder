@@ -26,15 +26,12 @@ const parseURL = require("webpack-dev-server/client/utils/parseURL").default;
 
 const createSocketURL = require("webpack-dev-server/client/utils/createSocketURL").default;
 
-console.log("Hi from webpackHotDevClientV4");
-
 const socketUrl = createSocketURL(parseURL());
 
 const parsedSocketUrl = new URL(socketUrl);
 
 //const hotness = import.meta; // if using esmodules
 const hotness = module.hot; // if using commonjs
-console.log("hotness", hotness);
 
 if (hotness) {
 	ErrorOverlay.setEditorHandler(function editorHandler(errorLocation) {
