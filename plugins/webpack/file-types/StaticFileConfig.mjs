@@ -39,6 +39,7 @@ const staticFileConfig = async ({ config, isProduction, isNode }) => {
 						/\.gif$/,
 						/\.jpe?g$/,
 						/\.png$/,
+						/\.svg$/,
 					],
 
 					...(

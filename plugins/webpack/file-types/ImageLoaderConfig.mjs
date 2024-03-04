@@ -25,6 +25,7 @@ const imageLoaderConfig = async ({ config, isProduction, isNode }) => {
 						/\.gif$/,
 						/\.jpe?g$/,
 						/\.png$/,
+						/\.svg$/,
 					],
 					...(useAssetModules
 						? {
