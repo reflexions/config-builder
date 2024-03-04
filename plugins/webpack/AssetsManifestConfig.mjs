@@ -4,7 +4,7 @@ import {
 import {
 	getAppAssetsManifest,
 } from "../context-providers/paths/Paths.mjs";
-//import WebpackAssetsManifest from 'webpack-assets-manifest';
+import WebpackAssetsManifest from 'webpack-assets-manifest';
 import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
 import stringToBoolean from "@reflexions/string-to-boolean";
 import { getIsNode } from "./SeparateNodeAndBrowserBuilds.mjs";
@@ -20,30 +20,30 @@ const assetsManifestConfig = async ({ config, isProduction, isNode }) => {
 			// Output all files in a manifest file called assets-manifest.json
 			// in the build directory.
 
-			// new WebpackAssetsManifest({
-			// 	output: getAppAssetsManifest(),
-			// 	writeToDisk: true,
-			//
-			// 	// https://www.npmjs.com/package/webpack-assets-manifest#publicpath
-			// 	// this will be the PORT+1 server for dev builds
-			// 	publicPath: true,
-			//
-			// 	// entryPoints: true
-			//
-			// 	// dev builds spend a few hundred ms calculating the hashes if this is on
-			// 	integrity: stringToBoolean(process.env.RESOURCE_INTEGRITY ?? isProduction),
-			// }),
-
-			new WebpackManifestPlugin({
-				fileName: getAppAssetsManifest(),
-				writeToFileEmit: true,
+			new WebpackAssetsManifest({
+				output: getAppAssetsManifest(),
+				writeToDisk: true,
 
 				// https://www.npmjs.com/package/webpack-assets-manifest#publicpath
 				// this will be the PORT+1 server for dev builds
-				//publicPath: true,
+				publicPath: true,
 
-				// entryPoints: true
+				entrypoints: true,
+
+				// dev builds spend a few hundred ms calculating the hashes if this is on
+				integrity: stringToBoolean(process.env.RESOURCE_INTEGRITY ?? isProduction),
 			}),
+
+			// new WebpackManifestPlugin({
+			// 	fileName: getAppAssetsManifest(),
+			// 	writeToFileEmit: true,
+			//
+			// 	// https://www.npmjs.com/package/webpack-assets-manifest#publicpath
+			// 	// this will be the PORT+1 server for dev builds
+			// 	//publicPath: true,
+			//
+			// 	// entryPoints: true
+			// }),
 		],
 	});
 };

@@ -11,6 +11,7 @@ import {
 } from "../context-providers/paths/Paths.mjs";
 import CopyPlugin from 'copy-webpack-plugin';
 import { getHookFn } from "../../RunPlugins.mjs";
+import { silentMkdir } from "../../utils/silentMkdir.mjs";
 
 /* https://webpack.js.org/configuration/target/#target */
 export const getBrowserTargetHook = Symbol("getBrowserTargetHook");
@@ -22,9 +23,8 @@ export const getBrowserLibraryTargetHook = Symbol("getBrowserLibraryTargetHook")
 
 
 const browserConfig = async ({ config, isProduction }) => {
-	const hasPublicDir = await access(getAppSrcPublicDir(), constants.R_OK)
-		.then(() => true)
-		.catch(() => false);
+	// make sure the dir that we're going to copy into (/var/www/html/build/public) exists
+	await silentMkdir(getAppSrcPublicDir());
 
 	return ({
 		...config,
@@ -32,7 +32,7 @@ const browserConfig = async ({ config, isProduction }) => {
 		target: await getHookFn(getBrowserTargetHook),
 		entry: {
 			client: [
-				"/var/www/html/src/client",
+				"/var/www/html/src/client.js",
 			],
 		},
 		output: {
@@ -57,14 +57,29 @@ const browserConfig = async ({ config, isProduction }) => {
 			},
 
 			environment: {
+				// The environment supports arrow functions ('() => { ... }').
 				arrowFunction: true,
+				// The environment supports async function and await ('async function () { await ... }').
+				asyncFunction: true,
+				// The environment supports BigInt as literal (123n).
 				bigIntLiteral: true,
-				"const": true,
+				// The environment supports const and let for variable declarations.
+				const: true,
+				// The environment supports destructuring ('{ a, b } = obj').
 				destructuring: true,
+				// The environment supports an async import() function to import EcmaScript modules.
 				dynamicImport: true,
+				// The environment supports an async import() when creating a worker, only for web targets at the moment.
+				dynamicImportInWorker: true,
+				// The environment supports 'for of' iteration ('for (const x of array) { ... }').
 				forOf: true,
-				"module": true,
+				// The environment supports 'globalThis'.
+				globalThis: true,
+				// The environment supports ECMAScript Module syntax to import ECMAScript modules (import ... from '...').
+				module: true,
+				// The environment supports optional chaining ('obj?.a' or 'obj?.()').
 				optionalChaining: true,
+				// The environment supports template literals.
 				templateLiteral: true,
 			},
 		},
@@ -72,7 +87,7 @@ const browserConfig = async ({ config, isProduction }) => {
 		plugins: [
 			...config.plugins ?? [],
 
-			hasPublicDir && new CopyPlugin({
+			new CopyPlugin({
 				patterns: [
 					{
 						from: getAppSrcPublicDir().replace(/\\/g, '/') + '/**/*',

@@ -43,7 +43,7 @@ const nodeConfig = async ({ config, isProduction }) => ({
 			isProduction
 				? null
 				: "/var/www/html/node_modules/webpack/hot/poll.js?300",
-			"/var/www/html/src",
+			"/var/www/html/src/index.js",
 		].filter(x => x),
 	},
 	output: {
@@ -72,6 +72,8 @@ const nodeConfig = async ({ config, isProduction }) => ({
 		environment: {
 			// The environment supports arrow functions ('() => { ... }').
 			arrowFunction: true,
+			// The environment supports async function and await ('async function () { await ... }').
+			asyncFunction: true,
 			// The environment supports BigInt as literal (123n).
 			bigIntLiteral: true,
 			// The environment supports const and let for variable declarations.

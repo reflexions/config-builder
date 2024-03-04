@@ -9,12 +9,11 @@ const optimizationConfig = async ({ config, isProduction, isNode }) => {
 		...config,
 
 		optimization: {
-			minimize: false,
-			providedExports: false,
-			removeAvailableModules: false,
-			removeEmptyChunks: false,
-			sideEffects: false,
-			splitChunks: false
+			minimize: isProduction,
+			providedExports: isProduction,
+			removeAvailableModules: isProduction,
+			removeEmptyChunks: isProduction,
+			sideEffects: isProduction,
 		},
 	});
 };

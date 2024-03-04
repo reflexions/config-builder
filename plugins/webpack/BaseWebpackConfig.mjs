@@ -24,7 +24,7 @@ const baseConfig = async ({ isProduction, isNode }) => ({
 	context: await getHookFn(getContextHook, () => "/var/www/html"),
 	devtool: await getHookFn(getDevToolHook, () => isProduction ? "source-map" : "eval-cheap-module-source-map"),
 	output: {
-		pathinfo: false,
+		pathinfo: !isProduction,
 		hashFunction: 'xxhash64',
 		crossOriginLoading: await getHookFn(getCrossOriginLoadingHook, () => isProduction ? undefined : "anonymous"),
 	},

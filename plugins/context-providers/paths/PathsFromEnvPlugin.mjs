@@ -32,7 +32,7 @@ const pathsFromEnvPlugin = async (passthrough) => {
 	paths.set(appBuildDirSymbol, appDirBuilder('build'));
 	paths.set(appBuildPublicDirSymbol, appDirBuilder('build/public'));
 	paths.set(appAssetsManifestSymbol, appDirBuilder('build/assets.json'));
-	paths.set(appSrcPublicDirSymbol, process.env.PUBLIC_DIR ?? appDirBuilder('public'));
+	paths.set(appSrcPublicDirSymbol, appDirBuilder('public'));
 	paths.set(appNodeModulesSymbol, appDirBuilder('node_modules'));
 	paths.set(appSrcSymbol, appDirBuilder('src'));
 	paths.set(appPackageJsonSymbol, appDirBuilder('package.json'));

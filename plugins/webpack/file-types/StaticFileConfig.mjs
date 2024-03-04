@@ -1,6 +1,8 @@
 import { getIsProduction } from "../../context-providers/options/Options.mjs";
 import { getIsNode } from "../SeparateNodeAndBrowserBuilds.mjs";
 
+const useAssetModules = true;
+
 const staticFileConfig = async ({ config, isProduction, isNode }) => {
 	return {
 		...config,
@@ -18,36 +20,55 @@ const staticFileConfig = async ({ config, isProduction, isNode }) => {
 						],
 					},
 					exclude: [
-						/\.html$/,
+						// scripts
 						/\.(js|jsx|mjs)$/,
+						/\.cjs/,
 						/\.(ts|tsx)$/,
 						/\.(vue)$/,
+
+						// styles
 						/\.(less)$/,
-						/\.(re)$/,
 						/\.(s?css|sass)$/,
+
+						// static
+						/\.html$/,
 						/\.json$/,
+
+						// images
 						/\.bmp$/,
 						/\.gif$/,
 						/\.jpe?g$/,
 						/\.png$/,
-						/\.cjs/,
 					],
-					// use: [
-					// 	{
-					// 		ident: "static-file-loader",
-					// 		loader: "file-loader",
-					// 		options: {
-					// 			emitFile: !isNode,
-					// 			name: "static/media/[name].[contenthash:8].[ext]",
-					// 		},
-					// 	},
-					// ],
 
-					type: 'asset/resource',
-					generator: {
-						filename: "static/media/[name].[contenthash:8][ext]",
-						emit: !isNode,
-					},
+					...(
+						useAssetModules
+							? {
+								type: 'asset/resource',
+								generator: {
+									filename: `asset/${isNode ? 'node' : 'client'}/[name].[contenthash:8][ext]`,
+									emit: !isNode,
+									//emit: true,
+								},
+							}
+							: {
+								use: [
+									{
+										ident: "static-file-loader",
+										loader: "file-loader",
+										options: {
+											emitFile: !isNode,
+											name: "static/media/[name].[contenthash:8].[ext]",
+										},
+									},
+								],
+
+								// stop Asset Modules from processing your assets again as that would result in asset duplication
+								type: 'javascript/auto',
+							}
+					),
+
+
 				},
 			],
 		},

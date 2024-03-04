@@ -1,6 +1,7 @@
 import { writeFile } from "node:fs/promises";
 import { productionSymbol } from "../context-providers/options/Options.mjs";
 import optionsContext from "../context-providers/options/OptionsContext.mjs";
+import { silentMkdir } from "../../utils/silentMkdir.mjs";
 
 /**
  * Adds the constructor name to object values
@@ -40,6 +41,8 @@ const logConfigPlugin = async (basePath, config) => {
 	const prodOrDev = optionsContext.getStore().get(productionSymbol)
 		? 'prod'
 		: 'dev';
+
+	await silentMkdir(basePath);
 
 	// https://stackoverflow.com/a/12075970/329062
 	Object.defineProperty(RegExp.prototype, "toJSON", {
