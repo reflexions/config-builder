@@ -1,6 +1,6 @@
 {
 	"name": "@reflexions/config-builder",
-	"version": "1.0.4",
+	"version": "1.0.5",
 	"description": "Calls plugins to generate and run a config",
 	"repository": {
 		"type": "git",
@@ -30,7 +30,9 @@
 		"@reflexions/string-to-boolean": "^1.0.0",
 		"autoprefixer": "^10.4.16",
 		"chalk": "^5.3.0",
+		"clean-css": "^5.3.3",
 		"copy-webpack-plugin": "^11.0.0",
+		"css-minimizer-webpack-plugin": "^6.0.0",
 		"mini-css-extract-plugin": "^2.7.6",
 		"postcss-custom-media": "^10.0.2",
 		"postcss-nesting": "^12.0.1",
@@ -40,6 +42,7 @@
 		"react-error-overlay": "^6.0.11",
 		"schema-utils": "^4.2.0",
 		"strip-ansi": "^7.1.0",
+		"terser-webpack-plugin": "^5.3.10",
 		"webpack": "^5.89.0",
 		"webpack-assets-manifest": "^5.1.0",
 		"webpack-dev-server": "^4.15.1"

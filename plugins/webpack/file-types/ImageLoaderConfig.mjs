@@ -1,7 +1,7 @@
 import { getIsProduction } from "../../context-providers/options/Options.mjs";
 import { getIsNode } from "../SeparateNodeAndBrowserBuilds.mjs";
 
-const useAssetModules = false;
+const useAssetModules = true;
 
 // Inlines small images (see limit)
 const imageLoaderConfig = async ({ config, isProduction, isNode }) => {
@@ -36,7 +36,8 @@ const imageLoaderConfig = async ({ config, isProduction, isNode }) => {
 									ident: "image-loader",
 									loader: "url-loader",
 									options: {
-										emitFile: !isNode,
+										//emitFile: !isNode,
+										emitFile: true,
 										limit: 10000,
 										name: "static/media/[name].[contenthash:8].[ext]",
 									},
