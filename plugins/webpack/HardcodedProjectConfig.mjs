@@ -7,8 +7,10 @@ import {
 } from "./SeparateNodeAndBrowserBuilds.mjs";
 import stringToBoolean from "@reflexions/string-to-boolean";
 import webpackContext from "../context-providers/webpack/WebpackContext.mjs";
-import path from "node:path";
-import { getHookFn } from "RunPlugins.mjs";
+import {
+	getHook,
+	getHookFn,
+} from "RunPlugins.mjs";
 
 // these vars should match utils/constants/Sites.mjs
 const CUSTOMER_SITE = "customer-site";
@@ -16,35 +18,36 @@ const B2B = "b2b";
 const DISCOUNT_PORTAL = "discount-portal";
 const GROUP_ADMIN = "group-admin";
 
-const publicVarDefine = (name, value) => ({
+export const publicVarDefine = (name, value) => ({
 	[ `process.env.${name}` ]: value,
 	[ `PublicAppVars.${name}` ]: value,
 	[ `ProcessEnvVars.${name}` ]: value, // PublicAppVars reads this
 });
-const privateVarDefine = (name, value) => ({
+
+export const privateVarDefine = (name, value) => ({
 	[ `process.env.${name}` ]: value,
 	[ `EnvVars.${name}` ]: value,
 });
 
 export const modifyDefinesHook = Symbol("modifyDefinesHook");
+export const phasesHook = Symbol("phasesHook");
 
 const hardcodedProjectConfig = async ({ config, isProduction, isBrowser }) => {
-	// could put this SITE stuff behind a isProduction, but HMR recompiles
-	// everything it sees when one file changes so this helps limit the rebuild
-
-
 	const SITE = JSON.stringify(process.env.SITE);
-	const PHASE = JSON.stringify(process.env.PHASE ? PHASES[ process.env.PHASE.toLowerCase() ] : PHASES.bu4);
 	const isB2b = JSON.stringify(process.env.SITE === B2B);
 	const isB2bApi = JSON.stringify([ B2B, DISCOUNT_PORTAL ].includes(process.env.SITE));
 	const isDiscount = JSON.stringify(process.env.SITE === DISCOUNT_PORTAL);
 	const isGroupAdmin = JSON.stringify(process.env.SITE === GROUP_ADMIN);
 
+	const PHASES = getHook(phasesHook, {});
+	const selectedPhase = PHASES[ process.env.PHASE.toLowerCase() ];
+	const PHASE = typeof selectedPhase === "string"
+		? JSON.stringify(selectedPhase) // adds the quotes
+		: selectedPhase; // can leave numbers & undefined as-is
+
 	const noDebug = JSON.stringify(process.env.DEBUG_STRIPPED === '1');
 	const RESOURCE_INTEGRITY = JSON.stringify(stringToBoolean(process.env.RESOURCE_INTEGRITY ?? isProduction));
 	const EMOTION_SSR = JSON.stringify(stringToBoolean(process.env.EMOTION_SSR ?? isProduction));
-
-	const PASSES_ENABLED = JSON.stringify(process.env.PASSES_ENABLED);
 
 	const defaultsDefines = {
 		// by hardcoding SITE during build, the optimizer can tree shake out other sites
