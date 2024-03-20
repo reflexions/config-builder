@@ -3,7 +3,7 @@ import webpackContext from "../../context-providers/webpack/WebpackContext.mjs";
 import StartServerPlugin from "razzle-start-server-webpack-plugin";
 import {
 	getHook,
-	getHookFn,
+	getHookFnResult,
 } from "../../../RunPlugins.mjs";
 
 const attachHmrServerCrumb = Symbol("attachHmrServerCrumb");
@@ -28,7 +28,7 @@ const attachHmrServer = async config => {
 		plugins: [
 			...config?.plugins,
 			new webpack.HotModuleReplacementPlugin(),
-			getHookFn(startServerPluginHook, () => new StartServerPlugin(getHook(startServerPluginArgsHook, ({
+			getHookFnResult(startServerPluginHook, () => new StartServerPlugin(getHook(startServerPluginArgsHook, ({
 				entryName: "server",
 				inject: false,
 				killOnError: false,

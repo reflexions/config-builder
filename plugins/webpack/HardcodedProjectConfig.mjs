@@ -9,7 +9,7 @@ import stringToBoolean from "@reflexions/string-to-boolean";
 import webpackContext from "../context-providers/webpack/WebpackContext.mjs";
 import {
 	getHook,
-	getHookFn,
+	getHookFnResult,
 } from "../../RunPlugins.mjs";
 
 // these vars should match utils/constants/Sites.mjs
@@ -40,7 +40,7 @@ const hardcodedProjectConfig = async ({ config, isProduction, isBrowser }) => {
 	const isGroupAdmin = JSON.stringify(process.env.SITE === GROUP_ADMIN);
 
 	const PHASES = getHook(phasesHook, {});
-	const selectedPhase = PHASES[ process.env.PHASE.toLowerCase() ];
+	const selectedPhase = PHASES[ process.env.PHASE?.toLowerCase() ];
 	const PHASE = typeof selectedPhase === "string"
 		? JSON.stringify(selectedPhase) // adds the quotes
 		: selectedPhase; // can leave numbers & undefined as-is
@@ -84,8 +84,7 @@ const hardcodedProjectConfig = async ({ config, isProduction, isBrowser }) => {
 		defaultsDefines.process = { env: {} };
 	}
 
-	const modifyDefines = getHookFn(modifyDefinesHook, (defines) => defines);
-	const customizedDefines = modifyDefines(defaultsDefines);
+	const customizedDefines = getHookFnResult(modifyDefinesHook, (defines) => defines, [ defaultsDefines ]);
 
 	console.log("allDefines", customizedDefines);
 

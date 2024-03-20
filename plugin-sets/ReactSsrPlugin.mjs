@@ -1,5 +1,5 @@
 import baseWebpackConfig from '../plugins/webpack/BaseWebpackConfig.mjs';
-import runPlugins, { getHookFn } from "../RunPlugins.mjs";
+import runPlugins, { getHookFnResult } from "../RunPlugins.mjs";
 import separateNodeAndBrowserBuilds, {
 	buildBrowserConfig,
 	buildNodeConfig,
@@ -49,12 +49,12 @@ const sharedPlugins = [
 	optimizationConfig,
 ];
 const reactSsrPlugin = async () => await runPlugins([
-	pathsContextPlugin(await getHookFn(pathsContextPluginsHook, async () => [
+	pathsContextPlugin(await getHookFnResult(pathsContextPluginsHook, async () => [
 		pathsFromEnvPlugin,
-		optionsContextPlugin(await getHookFn(optionsContextPluginsHook, async () => [
+		optionsContextPlugin(await getHookFnResult(optionsContextPluginsHook, async () => [
 			optionsFromEnvPlugin,
-			compilationReportContextPlugin(await getHookFn(compilationReportContextPluginsHook, async () => [
-				webpackContextPlugin(await getHookFn(webpackContextPluginsHook, async () => [
+			compilationReportContextPlugin(await getHookFnResult(compilationReportContextPluginsHook, async () => [
+				webpackContextPlugin(await getHookFnResult(webpackContextPluginsHook, async () => [
 					separateNodeAndBrowserBuilds(),
 					{
 						name: "browser-and-node-builds",
@@ -73,9 +73,9 @@ const reactSsrPlugin = async () => await runPlugins([
 							].filter(x => x)) ],
 						]),
 					},
-					...await getHookFn(preCompilePluginsHook, async () => []),
+					...await getHookFnResult(preCompilePluginsHook, async () => []),
 					webpackCompile,
-					...await getHookFn(postCompilePluginsHook, async () => []),
+					...await getHookFnResult(postCompilePluginsHook, async () => []),
 				])),
 			])),
 		])),

@@ -9,7 +9,19 @@ export const getHook = (hookSymbol, defaultImplementation = undefined) => {
 	return availableHooksContext.getStore().get(hookSymbol)?.[ 0 ] ?? defaultImplementation;
 };
 
-export const getHookFn = (hookSymbol, defaultImplementation = undefined, args = []) => {
+/**
+ * Looks up hookSymbol
+ * If the hook isn't defined, uses defaultImplementation
+ *
+ * Calls that function with args
+ * Returns the result
+ *
+ * @param hookSymbol
+ * @param defaultImplementation
+ * @param args
+ * @returns {*}
+ */
+export const getHookFnResult = (hookSymbol, defaultImplementation = undefined, args = []) => {
 	const oldStore = availableHooksContext.getStore();
 	const existingHookList = oldStore.get(hookSymbol);
 

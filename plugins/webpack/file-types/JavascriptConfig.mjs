@@ -2,7 +2,7 @@ import {
 	getIsProduction,
 	getShouldUseReactRefresh,
 } from "../../context-providers/options/Options.mjs";
-import { getHookFn } from "../../../RunPlugins.mjs";
+import { getHookFnResult } from "../../../RunPlugins.mjs";
 import { getIsNode } from "../SeparateNodeAndBrowserBuilds.mjs";
 import stringToBoolean from "@reflexions/string-to-boolean";
 import {
@@ -48,7 +48,7 @@ export const presetEnvOptions = async (target, old_browser_compat) => {
 	options.debug = true;
 
 	// same list in postcss-options.js
-	options.targets = await getHookFn(getTargetsHook, undefined, [ isNode ]);
+	options.targets = await getHookFnResult(getTargetsHook, undefined, [ isNode ]);
 
 	if (target === 'node' || !old_browser_compat) {
 		// https://babeljs.io/docs/en/babel-preset-env#targetsesmodules
@@ -173,7 +173,7 @@ const javascriptConfig = async ({ config, isProduction, isNode }) => {
 											bugfixes: true,
 											debug: true,
 											modules: false,
-											targets: await getHookFn(getTargetsHook, undefined, [ isNode ]),
+											targets: await getHookFnResult(getTargetsHook, undefined, [ isNode ]),
 											useBuiltIns: false,
 										},
 									],
@@ -190,7 +190,7 @@ const javascriptConfig = async ({ config, isProduction, isNode }) => {
 								],
 								sourceMaps: true,
 								sourceType: "module",
-								targets: await getHookFn(getTargetsHook, undefined, [ isNode ]),
+								targets: await getHookFnResult(getTargetsHook, undefined, [ isNode ]),
 							},
 						},
 					],

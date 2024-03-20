@@ -2,7 +2,7 @@ import {
 	getHmrClientPublicUrl,
 	getIsProduction,
 } from "../context-providers/options/Options.mjs";
-import { getHookFn } from "../../RunPlugins.mjs";
+import { getHookFnResult } from "../../RunPlugins.mjs";
 import WaitForAssetsPlugin from "./webpack-plugins/WaitForAssetsPlugin.mjs";
 
 /* https://webpack.js.org/configuration/target/#target */
@@ -36,7 +36,7 @@ const outputModules = false;
 const nodeConfig = async ({ config, isProduction }) => ({
 	...config,
 
-	target: await getHookFn(getNodeTargetHook),
+	target: await getHookFnResult(getNodeTargetHook),
 	entry: {
 		"server": [
 			//"/var/www/html/node_modules/razzle-dev-utils/prettyNodeErrors.js",
@@ -55,17 +55,17 @@ const nodeConfig = async ({ config, isProduction }) => ({
 			? '/'
 			: getHmrClientPublicUrl().href,
 
-		filename: await getHookFn(getNodeOutputFilenameHook, () => `[name].${isProduction
+		filename: await getHookFnResult(getNodeOutputFilenameHook, () => `[name].${isProduction
 			? '[contenthash:8].'
 			: ''}js`),
-		chunkFilename: await getHookFn(getNodeOutputChunkFilenameHook, () => `[name].${isProduction
+		chunkFilename: await getHookFnResult(getNodeOutputChunkFilenameHook, () => `[name].${isProduction
 			? '[contenthash:8].'
 			: ''}chunk.js`),
 
 		/* deprecated https://webpack.js.org/configuration/output/#outputlibrarytarget */
-		//libraryTarget: await getHookFn(getNodeLibraryTargetHook, () => "commonjs2"),
+		//libraryTarget: await getHookFnResult(getNodeLibraryTargetHook, () => "commonjs2"),
 		library: {
-			type: await getHookFn(getNodeLibraryTargetHook, () => outputModules ? "module" : "commonjs2"),
+			type: await getHookFnResult(getNodeLibraryTargetHook, () => outputModules ? "module" : "commonjs2"),
 			name: "server",
 		},
 

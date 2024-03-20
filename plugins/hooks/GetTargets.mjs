@@ -1,10 +1,10 @@
-import { getHookFn } from "../../RunPlugins.mjs";
+import { getHookFnResult } from "../../RunPlugins.mjs";
 import { getNodeTargetsHook } from "../webpack/NodeConfig.mjs";
 import { getBrowserTargetsHook } from "../webpack/BrowserConfig.mjs";
 
 const getTargets = async (isNode) => isNode
-	? await getHookFn(getNodeTargetsHook)
-	: await getHookFn(getBrowserTargetsHook);
+	? await getHookFnResult(getNodeTargetsHook)
+	: await getHookFnResult(getBrowserTargetsHook);
 export const getTargetsCrumb = Symbol(getTargets.name);
 export const getTargetsHook = Symbol("getTargetsHook");
 

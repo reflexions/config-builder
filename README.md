@@ -31,7 +31,7 @@ The convention is to use -SyncHook, -AsyncHook, or -Hook suffixes, respectively.
 
 `getHook` returns the hook's value.
 
-`getHookFn` calls the hook with the given parameters and returns the result.
+`getHookFnResult` calls the hook with the given parameters and returns the result.
 
 
 ## Misc

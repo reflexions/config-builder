@@ -10,7 +10,7 @@ import {
 	getAppSrcPublicDir,
 } from "../context-providers/paths/Paths.mjs";
 import CopyPlugin from 'copy-webpack-plugin';
-import { getHookFn } from "../../RunPlugins.mjs";
+import { getHookFnResult } from "../../RunPlugins.mjs";
 import { silentMkdir } from "../../utils/silentMkdir.mjs";
 
 /* https://webpack.js.org/configuration/target/#target */
@@ -29,7 +29,7 @@ const browserConfig = async ({ config, isProduction }) => {
 	return ({
 		...config,
 
-		target: await getHookFn(getBrowserTargetHook),
+		target: await getHookFnResult(getBrowserTargetHook),
 		entry: {
 			client: [
 				"/var/www/html/src/client.js",
@@ -42,17 +42,17 @@ const browserConfig = async ({ config, isProduction }) => {
 			publicPath: isProduction
 				? '/'
 				: getHmrClientPublicUrl().href,
-			filename: await getHookFn(getBrowserOutputFilenameHook, () => `static/js/[name].${isProduction
+			filename: await getHookFnResult(getBrowserOutputFilenameHook, () => `static/js/[name].${isProduction
 				? '[contenthash:8].'
 				: ''}js`),
-			chunkFilename: await getHookFn(getBrowserOutputChunkFilenameHook, () => `static/js/[name].${isProduction
+			chunkFilename: await getHookFnResult(getBrowserOutputChunkFilenameHook, () => `static/js/[name].${isProduction
 				? '[contenthash:8].'
 				: ''}chunk.js`),
 
 			/* deprecated https://webpack.js.org/configuration/output/#outputlibrarytarget */
-			libraryTarget: await getHookFn(getBrowserLibraryTargetHook, () => "var"),
+			libraryTarget: await getHookFnResult(getBrowserLibraryTargetHook, () => "var"),
 			library: {
-				type: await getHookFn(getBrowserLibraryTargetHook, () => "var"),
+				type: await getHookFnResult(getBrowserLibraryTargetHook, () => "var"),
 				name: "client",
 			},
 

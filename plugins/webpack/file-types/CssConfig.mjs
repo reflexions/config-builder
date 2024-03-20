@@ -7,7 +7,7 @@ import postcssNesting from "postcss-nesting";
 import postcssReporter from 'postcss-reporter';
 import postcssCustomMedia from 'postcss-custom-media';
 import autoprefixer from "autoprefixer";
-import { getHookFn } from "../../../RunPlugins.mjs";
+import { getHookFnResult } from "../../../RunPlugins.mjs";
 import { getTargetsHook } from "../../hooks/GetTargets.mjs";
 
 const cssConfig = async ({ config, isProduction, isNode }) => {
@@ -120,7 +120,7 @@ const cssConfig = async ({ config, isProduction, isNode }) => {
 
 												(isProduction || old_browser_compat) && !isNode && autoprefixer({
 													// https://github.com/postcss/autoprefixer#options
-													overrideBrowserslist: await getHookFn(getTargetsHook, undefined, [ isNode ]),
+													overrideBrowserslist: await getHookFnResult(getTargetsHook, undefined, [ isNode ]),
 												}),
 
 												// Log PostCSS messages in the console

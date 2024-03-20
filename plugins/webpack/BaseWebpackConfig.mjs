@@ -8,7 +8,7 @@ import {
 } from "./SeparateNodeAndBrowserBuilds.mjs";
 import {
 	getHook,
-	getHookFn,
+	getHookFnResult,
 } from "../../RunPlugins.mjs";
 
 const profile = false; // https://webpack.js.org/configuration/other-options/#profile
@@ -20,13 +20,13 @@ export const getDevToolHook = Symbol("getDevToolHook");
 export const getCrossOriginLoadingHook = Symbol("getCrossOriginLoadingHook");
 
 const baseConfig = async ({ isProduction, isNode }) => ({
-	mode: await getHookFn(getModeHook, () => isProduction ? "production" : "development"),
-	context: await getHookFn(getContextHook, () => "/var/www/html"),
-	devtool: await getHookFn(getDevToolHook, () => isProduction ? "source-map" : "eval-cheap-module-source-map"),
+	mode: await getHookFnResult(getModeHook, () => isProduction ? "production" : "development"),
+	context: await getHookFnResult(getContextHook, () => "/var/www/html"),
+	devtool: await getHookFnResult(getDevToolHook, () => isProduction ? "source-map" : "eval-cheap-module-source-map"),
 	output: {
 		pathinfo: !isProduction,
 		hashFunction: 'xxhash64',
-		crossOriginLoading: await getHookFn(getCrossOriginLoadingHook, () => isProduction ? undefined : "anonymous"),
+		crossOriginLoading: await getHookFnResult(getCrossOriginLoadingHook, () => isProduction ? undefined : "anonymous"),
 	},
 	profile,
 	parallelism,

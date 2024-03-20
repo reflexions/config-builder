@@ -1,5 +1,5 @@
 import { AsyncLocalStorage } from "node:async_hooks";
-import { getHookFn } from "../../RunPlugins.mjs";
+import { getHookFnResult } from "../../RunPlugins.mjs";
 import optionsContext from "../context-providers/options/OptionsContext.mjs";
 import {
 	hasBrowserBuildSymbol,
@@ -24,12 +24,12 @@ export const getIsBrowser = () => targetPlatformContext.getStore() === targetPla
 const separateNodeAndBrowserBuilds = async () => {
 	const options = optionsContext.getStore();
 	const browserConfig = await targetPlatformContext.run(targetPlatforms.browser, async () =>
-		await getHookFn(buildBrowserConfig, () => null),
+		await getHookFnResult(buildBrowserConfig, () => null),
 	);
 	options.set(hasBrowserBuildSymbol, Boolean(browserConfig));
 
 	const nodeConfig = await targetPlatformContext.run(targetPlatforms.node, async () =>
-		await getHookFn(buildNodeConfig, () => null),
+		await getHookFnResult(buildNodeConfig, () => null),
 	);
 	options.set(hasNodeBuildSymbol, Boolean(nodeConfig));
 
