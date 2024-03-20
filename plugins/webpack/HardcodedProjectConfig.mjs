@@ -10,7 +10,7 @@ import webpackContext from "../context-providers/webpack/WebpackContext.mjs";
 import {
 	getHook,
 	getHookFn,
-} from "RunPlugins.mjs";
+} from "../../RunPlugins.mjs";
 
 // these vars should match utils/constants/Sites.mjs
 const CUSTOMER_SITE = "customer-site";
