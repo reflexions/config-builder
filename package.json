@@ -1,6 +1,6 @@
 {
 	"name": "@reflexions/config-builder",
-	"version": "1.0.10",
+	"version": "1.0.11",
 	"description": "Calls plugins to generate and run a config",
 	"repository": {
 		"type": "git",

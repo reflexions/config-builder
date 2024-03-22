@@ -19,14 +19,28 @@ export const getContextHook = Symbol("getContextHook");
 export const getDevToolHook = Symbol("getDevToolHook");
 export const getCrossOriginLoadingHook = Symbol("getCrossOriginLoadingHook");
 
+export const hashFunction = Symbol("hashFunction");
+export const resolveAlias = Symbol("resolveAlias");
+export const extensions = Symbol("extensions");
+export const modules = Symbol("modules");
+export const fallback = Symbol("fallback");
+export const resolveSpread = Symbol("resolveSpread");
+export const baseConfigSpread = Symbol("baseConfigSpread");
+
 const baseConfig = async ({ isProduction, isNode }) => ({
-	mode: await getHookFnResult(getModeHook, () => isProduction ? "production" : "development"),
+	mode: await getHookFnResult(getModeHook, () => isProduction
+		? "production"
+		: "development"),
 	context: await getHookFnResult(getContextHook, () => "/var/www/html"),
-	devtool: await getHookFnResult(getDevToolHook, () => isProduction ? "source-map" : "eval-cheap-module-source-map"),
+	devtool: await getHookFnResult(getDevToolHook, () => isProduction
+		? "source-map"
+		: "eval-cheap-module-source-map"),
 	output: {
 		pathinfo: !isProduction,
-		hashFunction: 'xxhash64',
-		crossOriginLoading: await getHookFnResult(getCrossOriginLoadingHook, () => isProduction ? undefined : "anonymous"),
+		hashFunction: getHook(hashFunction, 'xxhash64'),
+		crossOriginLoading: await getHookFnResult(getCrossOriginLoadingHook, () => isProduction
+			? undefined
+			: "anonymous"),
 	},
 	profile,
 	parallelism,
@@ -37,49 +51,51 @@ const baseConfig = async ({ isProduction, isNode }) => ({
 	},
 
 	resolve: {
-		alias: {
-			"date-fns": "date-fns/esm"
-		},
-		extensions: [
+		alias: getHook(resolveAlias, {}),
+		extensions: getHook(extensions, [
 			".mjs",
 			".js",
 			".jsx",
 			".json",
 			".ts",
-			".tsx"
-		],
-		mainFields: isNode ? [
-			"main",
-			"module"
-		] : [
-			"browser",
-			"module",
-			"main"
-		],
-		modules: [
+			".tsx",
+		]),
+		mainFields: isNode
+			? [
+				"main",
+				"module",
+			]
+			: [
+				"browser",
+				"module",
+				"main",
+			],
+		modules: getHook(modules, [
 			"/var/www/html/src",
 			"/var/www/html/src/styles",
-			"node_modules"
-		],
+			"node_modules",
+		]),
 		plugins: [],
 		unsafeCache: false,
 
-		...(isNode
+		fallback: getHook(fallback, isNode
 			? {}
 			: {
-				fallback: {
-					crypto: "/var/www/html/node_modules/crypto-js/index.js",
-					stream: "/var/www/html/node_modules/stream-browserify/index.js"
-				},
+				crypto: "/var/www/html/node_modules/crypto-js/index.js",
+				stream: "/var/www/html/node_modules/stream-browserify/index.js",
 			}
-		)
+		),
+
+		...getHook(resolveSpread, {}),
 	},
 	resolveLoader: {
 		modules: [
-			"/var/www/html/node_modules"
+			"/var/www/html/node_modules",
 		],
-		plugins: []
-	}
+		plugins: [],
+	},
+
+	...getHook(baseConfigSpread, {}),
 });
 
 const attachBaseWebpackConfigCrumb = Symbol("attachBaseWebpackConfig");
