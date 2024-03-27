@@ -64,13 +64,10 @@ export default class WaitForAssetsPlugin {
 		// Tapping to the "thisCompilation" hook in order to further tap
 		// to the compilation process on an earlier stage.
 		compiler.hooks.beforeCompile.tapPromise(pluginName, async (compilation, compilationParams) => {
-			console.log(`${pluginName} Tapped beforeCompile`);
 			await waitForAssetsJson();
 		});
 
 		compiler.hooks.thisCompilation.tap(pluginName, (compilation, compilationParams) => {
-			console.log(`${pluginName} Tapped thisCompilation`);
-
 			// Tapping to the assets processing pipeline on a specific stage.
 			compilation.hooks.processAssets.tapPromise(
 				{

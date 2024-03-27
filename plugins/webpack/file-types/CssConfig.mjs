@@ -7,10 +7,21 @@ import postcssNesting from "postcss-nesting";
 import postcssReporter from 'postcss-reporter';
 import postcssCustomMedia from 'postcss-custom-media';
 import autoprefixer from "autoprefixer";
-import { getHookFnResult } from "../../../RunPlugins.mjs";
+import {
+	getHook,
+	getHookFnResult,
+} from "../../../RunPlugins.mjs";
 import { getTargetsHook } from "../../hooks/GetTargets.mjs";
+import postcssGlobalData from "@csstools/postcss-global-data";
+import {
+	getAppSrc,
+} from "../../context-providers/paths/Paths.mjs";
+
+export const postcssGlobalDataFilesHook = Symbol("postcssGlobalDataFilesHook");
 
 const cssConfig = async ({ config, isProduction, isNode }) => {
+
+	const srcDir = getAppSrc();
 
 	// we only do postcss on server build if using tailwind
 	// (needed so server build can understand tailwind's @apply)
@@ -86,7 +97,7 @@ const cssConfig = async ({ config, isProduction, isNode }) => {
 									exportOnlyLocals: isNode,
 
 									// don't need to include the 'src' prefix in css classnames
-									localIdentContext: (process.env.FRONTEND_BUILD_ROOT || '/var/www/html') + "/src",
+									localIdentContext: srcDir,
 									localIdentName: "[path]__[name]___[local]",
 
 
@@ -110,8 +121,19 @@ const cssConfig = async ({ config, isProduction, isNode }) => {
 											// https://github.com/webpack-contrib/postcss-loader#boolean
 											config: false,
 
-											ident: "postcss-loader",
+											ident: "postcss",
 											plugins: [
+												// https://www.npmjs.com/package/postcss-custom-media#modular-css-processing
+												// Make sure this is ALWAYS defined before postcssCustomMedia
+												postcssGlobalData({
+													files: getHook(postcssGlobalDataFilesHook, [
+														srcDir + '/styles/breakpoints.css',
+														srcDir + '/styles/colors.css',
+														srcDir + '/styles/sizings.css',
+														srcDir + '/styles/typography-vars.css',
+													]),
+												}),
+
 												postcssCustomMedia({
 													// https://github.com/csstools/postcss-plugins/tree/main/plugins/postcss-custom-media#options
 												}),

@@ -34,18 +34,16 @@ export default class BrowserDevServerPlugin {
 		const { webpack } = compiler;
 
 		compiler.hooks.afterCompile.tap(pluginName, (compilation) => {
-			console.log(`${pluginName} Tapped afterCompile`);
-
 			if (once) {
+				// there are two parallel compilations using BrowserDevServerPlugin?
+				// without this, we get "Error: listen EADDRINUSE: address already in use 0.0.0.0:81"
 				return;
 			}
 			else {
 				once = true;
 			}
 
-			console.log("start waitForCleanup");
 			const waitForCleanup = new Promise((resolve, reject) => {
-				console.log("waitForCleanup");
 				if (this.clientDevServer) {
 					console.log("stopping clientDevServer");
 					this.clientDevServer.stop()
@@ -53,26 +51,36 @@ export default class BrowserDevServerPlugin {
 						.catch(reject);
 				}
 				else {
-					console.log("done");
 					resolve();
 				}
 			});
-			waitForCleanup.then(() => {
-				console.log("creating new WebpackDevServer");
+			waitForCleanup.then(async () => {
 				// todo: get this from the compilation's devServer config somehow instead
 				const options = browserDevServerConfig();
-				this.clientDevServer = new WebpackDevServer(
+
+				// WebpackDevServer API docs: https://webpack.js.org/api/webpack-dev-server/
+				const clientDevServer = this.clientDevServer = new WebpackDevServer(
 					options,
 					compiler,
 				);
-				console.log(options);
-				this.clientDevServer.startCallback((err) => {
-					if (err) {
-						console.log("clientDevServer.startCallback err");
-						errorLog(err);
-					}
+
+				try {
+					await clientDevServer.start();
+
+					// without this initial invalidation, HMR doesn't start until you make
+					// a code edit. /static/js/client.js will be missing the
+					// webpack/hot/dev-server.js require.
+					// Alternatively, visiting {client url}/webpack-dev-server/invalidate
+					// is the same as making an edit
+					clientDevServer.invalidate(() => {
+						console.log("HMR startup workaround complete");
+					});
 					console.log("clientDevServer started");
-				});
+				}
+				catch (error) {
+					console.log("clientDevServer.startCallback error");
+					errorLog(error);
+				}
 			});
 		});
 	}

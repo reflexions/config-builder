@@ -4,9 +4,9 @@ import pluginSchema from "./PluginSchema.mjs";
 import availableHooksContext from "./AvailableHooksContext.mjs";
 
 
-export const getHook = (hookSymbol, defaultImplementation = undefined) => {
+export const getHook = (hookSymbol, defaultValue = undefined) => {
 	// the first element is the latest version of the hook that overrode the others in the array
-	return availableHooksContext.getStore().get(hookSymbol)?.[ 0 ] ?? defaultImplementation;
+	return availableHooksContext.getStore().get(hookSymbol)?.[ 0 ] ?? defaultValue;
 };
 
 /**

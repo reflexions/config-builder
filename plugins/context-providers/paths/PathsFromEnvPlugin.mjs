@@ -31,7 +31,7 @@ const pathsFromEnvPlugin = async (passthrough) => {
 	paths.set(appDirSymbol, appDirBuilder('.'));
 	paths.set(appBuildDirSymbol, appDirBuilder('build'));
 	paths.set(appBuildPublicDirSymbol, appDirBuilder('build/public'));
-	paths.set(appAssetsManifestSymbol, appDirBuilder('build/assets.json'));
+	paths.set(appAssetsManifestSymbol, appDirBuilder('build/assets-manifest.json'));
 	paths.set(appSrcPublicDirSymbol, appDirBuilder('public'));
 	paths.set(appNodeModulesSymbol, appDirBuilder('node_modules'));
 	paths.set(appSrcSymbol, appDirBuilder('src'));
@@ -52,6 +52,6 @@ export default {
 	main: (passthrough) => pathsFromEnvPlugin(passthrough),
 	crumb: pathsFromEnvCrumb,
 	hooks: new Map([
-		[ appDirBuilderSyncHook, (relativePath) => path.resolve('/var/www/html', relativePath) ],
+		[ appDirBuilderSyncHook, (relativePath) => path.resolve((process.env.FRONTEND_BUILD_ROOT || '/var/www/html'), relativePath) ],
 	]),
 };

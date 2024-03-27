@@ -1,10 +1,11 @@
 import {
+	getEmotionSsr,
 	getIsProduction,
+	getOldBrowserCompatibility,
 	getShouldUseReactRefresh,
 } from "../../context-providers/options/Options.mjs";
 import { getHookFnResult } from "../../../RunPlugins.mjs";
 import { getIsNode } from "../SeparateNodeAndBrowserBuilds.mjs";
-import stringToBoolean from "@reflexions/string-to-boolean";
 import {
 	getTargetsHook,
 } from "../../hooks/GetTargets.mjs";
@@ -105,9 +106,9 @@ export const transformRuntimePlugin = [
 ];
 
 const javascriptConfig = async ({ config, isProduction, isNode }) => {
-	const old_browser_compat = !isNode && Boolean(process.env.OLD_BROWSER_COMPAT || isProduction);
+	const old_browser_compat = !isNode && getOldBrowserCompatibility();
 	console.log("old_browser_compat", old_browser_compat, isNode, typeof process.env.OLD_BROWSER_COMPAT, isProduction);
-	const EMOTION_SSR = stringToBoolean(process.env.EMOTION_SSR ?? isProduction);
+	const EMOTION_SSR = getEmotionSsr();
 	return ({
 		...config,
 

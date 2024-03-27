@@ -1,11 +1,12 @@
 import {
 	getIsProduction,
+	getShouldCalculateResourceIntegrity,
 } from "../context-providers/options/Options.mjs";
 import {
 	getAppAssetsManifest,
 } from "../context-providers/paths/Paths.mjs";
 import WebpackAssetsManifest from 'webpack-assets-manifest';
-import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
+//import { WebpackManifestPlugin } from 'webpack-manifest-plugin';
 import stringToBoolean from "@reflexions/string-to-boolean";
 import { getIsNode } from "./SeparateNodeAndBrowserBuilds.mjs";
 import ConfigBuilderPlugin from "../../ConfigBuilderPlugin.mjs";
@@ -20,6 +21,7 @@ const assetsManifestConfig = async ({ config, isProduction, isNode }) => {
 			// Output all files in a manifest file called assets-manifest.json
 			// in the build directory.
 
+			// https://www.npmjs.com/package/webpack-assets-manifest#options-read-the-schema
 			new WebpackAssetsManifest({
 				output: getAppAssetsManifest(),
 				writeToDisk: true,
@@ -31,7 +33,9 @@ const assetsManifestConfig = async ({ config, isProduction, isNode }) => {
 				entrypoints: true,
 
 				// dev builds spend a few hundred ms calculating the hashes if this is on
-				integrity: stringToBoolean(process.env.RESOURCE_INTEGRITY ?? isProduction),
+				integrity: getShouldCalculateResourceIntegrity(),
+
+				space: "\t",
 			}),
 
 			// new WebpackManifestPlugin({

@@ -1,5 +1,8 @@
 import {
+	getDebugStripped,
+	getEmotionSsr,
 	getIsProduction,
+	getShouldCalculateResourceIntegrity,
 	getShouldUseReactRefresh,
 } from "../context-providers/options/Options.mjs";
 import {
@@ -45,10 +48,6 @@ const hardcodedProjectConfig = async ({ config, isProduction, isBrowser }) => {
 		? JSON.stringify(selectedPhase) // adds the quotes
 		: selectedPhase; // can leave numbers & undefined as-is
 
-	const noDebug = JSON.stringify(process.env.DEBUG_STRIPPED === '1');
-	const RESOURCE_INTEGRITY = JSON.stringify(stringToBoolean(process.env.RESOURCE_INTEGRITY ?? isProduction));
-	const EMOTION_SSR = JSON.stringify(stringToBoolean(process.env.EMOTION_SSR ?? isProduction));
-
 	const defaultsDefines = {
 		// by hardcoding SITE during build, the optimizer can tree shake out other sites
 		// could put this SITE stuff behind a isProduction, but HMR recompiles
@@ -62,12 +61,12 @@ const hardcodedProjectConfig = async ({ config, isProduction, isBrowser }) => {
 		...publicVarDefine("isGroupAdmin", isGroupAdmin),
 
 		// strips out debug code that would otherwise be controlled by env var
-		...publicVarDefine("DEBUG_STRIPPED", noDebug),
+		...publicVarDefine("DEBUG_STRIPPED", getDebugStripped()),
 
 		[ "__DEV__" ]: JSON.stringify(!isProduction), // apollo-client expects this https://github.com/apollographql/apollo-client/pull/8347
 
-		...privateVarDefine("RESOURCE_INTEGRITY", RESOURCE_INTEGRITY),
-		...privateVarDefine("EMOTION_SSR", EMOTION_SSR),
+		...privateVarDefine("RESOURCE_INTEGRITY", getShouldCalculateResourceIntegrity()),
+		...privateVarDefine("EMOTION_SSR", getEmotionSsr()),
 
 		[ "process.env.shouldUseReactRefresh" ]: JSON.stringify(getShouldUseReactRefresh()),
 	};

@@ -1,11 +1,17 @@
 import TerserPlugin from 'terser-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
-import CleanCSS from 'clean-css';
 import {
 	getIsProduction,
 } from "../context-providers/options/Options.mjs";
 
 import { getIsNode } from "./SeparateNodeAndBrowserBuilds.mjs";
+import {
+	getHook,
+	getHookFnResult,
+} from "../../RunPlugins.mjs";
+
+export const cssMinifierNameHook = Symbol("cssMinifierNameHook");
+export const cssMinifierPluginInstanceHook = Symbol("cssMinifierPluginInstanceHook");
 
 const terserPluginOptions = {
 	// https://webpack.js.org/plugins/terser-webpack-plugin/#options
@@ -51,6 +57,57 @@ const terserPluginOptions = {
 }
 
 const optimizationConfig = async ({ config, isProduction, isNode }) => {
+
+	// options from https://webpack.js.org/plugins/css-minimizer-webpack-plugin/#minify
+	// webpack's default is cssnanoMinify
+	// cleancss leaves in duplicate root var declarations and is ~2x bigger than the others
+	// esbuildMinify saves 3 sec but makes a slightly larger file than cssnano
+	const cssMinifierName = getHook(cssMinifierNameHook, "cssnanoMinify");
+
+	const cssMinifierPluginInstance = getHookFnResult(cssMinifierPluginInstanceHook, () => (
+		// in addition to minifying, this merges all css into a single file
+		new CssMinimizerPlugin({
+			minimizerOptions: ['cssnanoMinify'].includes(cssMinifierName)
+				? {
+					sourceMap: true,
+				}
+				: undefined,
+
+			// Default: CssMinimizerPlugin.cssnanoMinify
+			//minify: CssMinimizerPlugin.cleanCssMinify,
+			minify: CssMinimizerPlugin[ cssMinifierName ],
+
+			// to do it all manually (if you want to see the output before minification)
+			// minify: async (data, inputMap, minimizerOptions) => {
+			// 	// this import doesn't work if done earlier
+			//  // Webpack docs note: "Always use require inside minify function when parallel option enabled."
+			// 	const CleanCss = (await import('clean-css')).default;
+			//
+			// 	const [[filename, input]] = Object.entries(data);
+			//
+			// 	const minifiedCss = await new CleanCss({
+			// 		sourceMap: minimizerOptions.sourceMap,
+			// 		returnPromise: true,
+			// 	})
+			// 		.minify({
+			// 			[filename]: {
+			// 				styles: input,
+			// 				sourceMap: inputMap,
+			// 			},
+			// 		})
+			// 		.catch((error) => {
+			// 			console.error("CleanCss failed", error);
+			// 			throw error;
+			// 		});
+			//
+			// 	return {
+			// 		css: minifiedCss.styles,
+			// 		map: minifiedCss.sourceMap ? minifiedCss.sourceMap.toJSON() : '',
+			// 		warnings: minifiedCss.warnings,
+			// 	};
+			// },
+		})
+	));
 	return ({
 		...config,
 
@@ -63,26 +120,8 @@ const optimizationConfig = async ({ config, isProduction, isNode }) => {
 
 			minimizer: [
 				new TerserPlugin(terserPluginOptions),
-				// new CssMinimizerPlugin({
-				// 	minimizerOptions: {
-				// 		sourceMap: true,
-				// 	},
-				// 	minify: async (data, inputMap, minimizerOptions) => {
-				// 		const [[filename, input]] = Object.entries(data);
-				// 		const minifiedCss = await new CleanCSS({ sourceMap: minimizerOptions.sourceMap }).minify({
-				// 			[filename]: {
-				// 				styles: input,
-				// 				sourceMap: inputMap,
-				// 			},
-				// 		});
-				//
-				// 		return {
-				// 			css: minifiedCss.styles,
-				// 			map: minifiedCss.sourceMap ? minifiedCss.sourceMap.toJSON() : '',
-				// 			warnings: minifiedCss.warnings,
-				// 		};
-				// 	},
-				// })
+
+				cssMinifierPluginInstance,
 			],
 		},
 	});

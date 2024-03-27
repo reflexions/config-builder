@@ -42,7 +42,7 @@ const nodeConfig = async ({ config, isProduction }) => ({
 			//"/var/www/html/node_modules/razzle-dev-utils/prettyNodeErrors.js",
 			isProduction
 				? null
-				: "/var/www/html/node_modules/webpack/hot/poll.js?300",
+				: "webpack/hot/dev-server", // razzle used webpack/hot/poll.js?300 instead
 			"/var/www/html/src/index.js",
 		].filter(x => x),
 	},

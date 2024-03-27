@@ -1,5 +1,7 @@
 import stringToBoolean from "@reflexions/string-to-boolean";
 import {
+	debugStripped,
+	emotionSsr,
 	getHmrClientListenPort,
 	getListenPort,
 	getPublicUrl,
@@ -7,18 +9,22 @@ import {
 	hmrClientPublicUrlSymbol,
 	listenHostSymbol,
 	listenPortSymbol,
+	oldBrowserCompatibility,
 	productionSymbol,
 	publicUrlSymbol,
+	reactServerComponents,
+	serverNodeArgs,
+	shouldCalculateResourceIntegrity,
 	shouldUseReactRefreshSymbol,
 } from "./Options.mjs";
 import optionsContext from "./OptionsContext.mjs";
-import runPlugins from "../../../RunPlugins.mjs";
 
 const optionsFromEnvPlugin = async (passthrough) => {
 	const options = optionsContext.getStore();
 
 	// isProduction
-	options.set(productionSymbol, process.env.NODE_ENV === 'production');
+	const isProduction = process.env.NODE_ENV === 'production';
+	options.set(productionSymbol, isProduction);
 
 	// PUBLIC_URL
 	// The URL that users enter into their browser
@@ -39,6 +45,14 @@ const optionsFromEnvPlugin = async (passthrough) => {
 	options.set(hmrClientPublicUrlSymbol, Object.freeze(new URL(process.env.HMR_PUBLIC_URL ?? defaultHmrPublicUrl.href)));
 
 	options.set(shouldUseReactRefreshSymbol, stringToBoolean(process.env.SHOULD_USE_REACT_REFRESH ?? false));
+
+	options.set(shouldCalculateResourceIntegrity, stringToBoolean(process.env.RESOURCE_INTEGRITY ?? isProduction));
+	options.set(oldBrowserCompatibility, stringToBoolean(process.env.OLD_BROWSER_COMPAT ?? isProduction));
+	options.set(emotionSsr, stringToBoolean(process.env.EMOTION_SSR ?? isProduction));
+	options.set(debugStripped, stringToBoolean(process.env.DEBUG_STRIPPED ?? isProduction));
+	options.set(reactServerComponents, stringToBoolean(process.env.REACT_SERVER_COMPONENTS ?? false));
+	options.set(serverNodeArgs, JSON.parse(process.env.SERVER_NODE_ARGS ?? JSON.stringify(["--inspect=0.0.0.0:9229"])));
+
 
 	console.log("options", options);
 

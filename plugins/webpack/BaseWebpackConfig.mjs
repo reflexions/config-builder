@@ -72,7 +72,7 @@ const baseConfig = async ({ isProduction, isNode }) => ({
 			],
 		modules: getHook(modules, [
 			"/var/www/html/src",
-			"/var/www/html/src/styles",
+			// "/var/www/html/src/styles", // not needed now that we have postcssGlobalData importing this stuff automatically
 			"node_modules",
 		]),
 		plugins: [],

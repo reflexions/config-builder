@@ -81,8 +81,8 @@ const attachHmrClient = async config => {
 				"**/node_modules",
 				getAppAssetsManifest(),
 			],
-			aggregateTimeout: 500,
-			poll: false,
+			//aggregateTimeout: 500,
+			//poll: false,
 		},
 	};
 };
