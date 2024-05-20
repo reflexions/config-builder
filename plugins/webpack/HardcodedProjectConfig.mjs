@@ -35,6 +35,9 @@ export const privateVarDefine = (name, value) => ({
 
 export const modifyDefinesHook = Symbol("modifyDefinesHook");
 export const phasesHook = Symbol("phasesHook");
+export const additionalPublicDefinesHook = Symbol("additionalPublicDefinesHook");
+export const additionalPrivateDefinesHook = Symbol("additionalPrivateDefinesHook");
+export const additionalDefinesHook = Symbol("additionalDefinesHook");
 
 const hardcodedProjectConfig = async ({ config, isProduction, isBrowser }) => {
 	const CITY = JSON.stringify(process.env.CITY);
@@ -50,7 +53,14 @@ const hardcodedProjectConfig = async ({ config, isProduction, isBrowser }) => {
 		? JSON.stringify(selectedPhase) // adds the quotes
 		: selectedPhase; // can leave numbers & undefined as-is
 
+	const additionalPublicDefines = getHook(additionalPublicDefinesHook, new Map());
+	const additionalPrivateDefines = getHook(additionalPrivateDefinesHook, new Map());
+	const additionalDefines = getHook(additionalDefinesHook, new Map());
+
 	const defaultsDefines = {
+		[ "__DEV__" ]: JSON.stringify(!isProduction), // apollo-client expects this https://github.com/apollographql/apollo-client/pull/8347
+		[ "process.env.shouldUseReactRefresh" ]: JSON.stringify(getShouldUseReactRefresh()),
+
 		...publicVarDefine("CITY", CITY), // used by cubic-backoffice-types
 		// by hardcoding SITE during build, the optimizer can tree shake out other sites
 		// could put this SITE stuff behind a isProduction, but HMR recompiles
@@ -66,12 +76,12 @@ const hardcodedProjectConfig = async ({ config, isProduction, isBrowser }) => {
 		// strips out debug code that would otherwise be controlled by env var
 		...publicVarDefine("DEBUG_STRIPPED", getDebugStripped()),
 
-		[ "__DEV__" ]: JSON.stringify(!isProduction), // apollo-client expects this https://github.com/apollographql/apollo-client/pull/8347
-
 		...privateVarDefine("RESOURCE_INTEGRITY", getShouldCalculateResourceIntegrity()),
 		...privateVarDefine("EMOTION_SSR", getEmotionSsr()),
-
-		[ "process.env.shouldUseReactRefresh" ]: JSON.stringify(getShouldUseReactRefresh()),
+		
+		...Array.from(additionalPublicDefines).map(([key, value]) => publicVarDefine(key, value)),
+		...Array.from(additionalPrivateDefines).map(([key, value]) => privateVarDefine(key, value)),
+		...Object.fromEntries(additionalDefines),
 	};
 
 	if (!isProduction) {
