@@ -16,7 +16,7 @@ import {
 } from "../../RunPlugins.mjs";
 
 // these vars should match utils/constants/Sites.mjs
-const CUSTOMER_SITE = "customer-site";
+const CUSTOMER_SITE = "customer";
 const B2B = "b2b";
 const DISCOUNT_PORTAL = "discount-portal";
 const GROUP_ADMIN = "group-admin";
@@ -24,6 +24,7 @@ const GROUP_ADMIN = "group-admin";
 export const publicVarDefine = (name, value) => ({
 	[ `process.env.${name}` ]: value,
 	[ `PublicAppVars.${name}` ]: value,
+	[ `globalThis.PublicAppVars.${name}` ]: value, // cubic-backoffice-types uses this
 	[ `ProcessEnvVars.${name}` ]: value, // PublicAppVars reads this
 });
 
@@ -36,6 +37,7 @@ export const modifyDefinesHook = Symbol("modifyDefinesHook");
 export const phasesHook = Symbol("phasesHook");
 
 const hardcodedProjectConfig = async ({ config, isProduction, isBrowser }) => {
+	const CITY = JSON.stringify(process.env.CITY);
 	const SITE = JSON.stringify(process.env.SITE);
 	const isB2b = JSON.stringify(process.env.SITE === B2B);
 	const isB2bApi = JSON.stringify([ B2B, DISCOUNT_PORTAL ].includes(process.env.SITE));
@@ -49,6 +51,7 @@ const hardcodedProjectConfig = async ({ config, isProduction, isBrowser }) => {
 		: selectedPhase; // can leave numbers & undefined as-is
 
 	const defaultsDefines = {
+		...publicVarDefine("CITY", CITY), // used by cubic-backoffice-types
 		// by hardcoding SITE during build, the optimizer can tree shake out other sites
 		// could put this SITE stuff behind a isProduction, but HMR recompiles
 		// everything it sees when one file changes so this helps limit the rebuild

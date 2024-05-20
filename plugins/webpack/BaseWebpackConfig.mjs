@@ -1,3 +1,4 @@
+import ESLintPlugin from 'eslint-webpack-plugin';
 import {
 	getHmrClientPublicUrl,
 	getIsProduction,
@@ -18,6 +19,10 @@ export const getModeHook = Symbol("getModeHook");
 export const getContextHook = Symbol("getContextHook");
 export const getDevToolHook = Symbol("getDevToolHook");
 export const getCrossOriginLoadingHook = Symbol("getCrossOriginLoadingHook");
+
+export const useEslint = Symbol("useEslint");
+export const eslintPlugin = Symbol("eslintPlugin");
+export const eslintPluginOptions = Symbol("eslintPluginOptions");
 
 export const hashFunction = Symbol("hashFunction");
 export const resolveAlias = Symbol("resolveAlias");
@@ -50,15 +55,31 @@ const baseConfig = async ({ isProduction, isNode }) => ({
 		strictExportPresence: true,
 	},
 
+	plugins: [
+		...(getHook(useEslint, true)
+				? [
+					getHook(eslintPlugin, new ESLintPlugin(
+						getHook(eslintPluginOptions, {
+							lintDirtyModulesOnly: true,
+							configType: "flat", // https://webpack.js.org/plugins/eslint-webpack-plugin/#configtype
+							eslintPath: "eslint/use-at-your-own-risk", // required by configType: flat
+							failOnError: isProduction,
+						})
+					))
+				]
+				: []
+		),
+	],
+
 	resolve: {
 		alias: getHook(resolveAlias, {}),
 		extensions: getHook(extensions, [
 			".mjs",
 			".js",
-			".jsx",
-			".json",
-			".ts",
-			".tsx",
+			// ".jsx",
+			// ".json",
+			// ".ts",
+			// ".tsx",
 		]),
 		mainFields: isNode
 			? [
