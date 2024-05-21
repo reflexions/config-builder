@@ -78,7 +78,7 @@ const hardcodedProjectConfig = async ({ config, isProduction, isBrowser }) => {
 
 		...privateVarDefine("RESOURCE_INTEGRITY", getShouldCalculateResourceIntegrity()),
 		...privateVarDefine("EMOTION_SSR", getEmotionSsr()),
-		
+
 		...Array.from(additionalPublicDefines).map(([key, value]) => publicVarDefine(key, value)),
 		...Array.from(additionalPrivateDefines).map(([key, value]) => privateVarDefine(key, value)),
 		...Object.fromEntries(additionalDefines),

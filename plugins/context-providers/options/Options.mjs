@@ -27,3 +27,24 @@ export const getReactServerComponents = () => optionsContext.getStore().get(reac
 export const serverNodeArgs = Symbol('serverNodeArgs');
 export const getServerNodeArgs = () => optionsContext.getStore().get(serverNodeArgs);
 
+/**
+ * The default minification-enabled toggle. Set by MINIMIZE env var. Defaults to true if prod, false otherwise.
+ * @type {symbol}
+ */
+export const minimize = Symbol('minimize');
+export const getMinimize = () => optionsContext.getStore().get(minimize);
+
+/**
+ * Whether minification is enabled for the server build. Set by MINIMIZE_NODE env var. Defaults to getMinimize() value.
+ * @type {symbol}
+ */
+export const minimizeNode = Symbol('minimizeNode');
+export const getMinimizeNode = () => optionsContext.getStore().get(minimizeNode);
+
+/**
+ * Whether minification is enabled for the browser build. Set by MINIMIZE_BROWSER env var. Defaults to getMinimize() value.
+ * @type {symbol}
+ */
+export const minimizeBrowser = Symbol('minimizeBrowser');
+export const getMinimizeBrowser = () => optionsContext.getStore().get(minimizeBrowser);
+

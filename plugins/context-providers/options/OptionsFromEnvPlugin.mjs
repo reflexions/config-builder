@@ -4,11 +4,15 @@ import {
 	emotionSsr,
 	getHmrClientListenPort,
 	getListenPort,
+	getMinimize,
 	getPublicUrl,
 	hmrClientListenPortSymbol,
 	hmrClientPublicUrlSymbol,
 	listenHostSymbol,
 	listenPortSymbol,
+	minimize,
+	minimizeNode,
+	minimizeBrowser,
 	oldBrowserCompatibility,
 	productionSymbol,
 	publicUrlSymbol,
@@ -53,6 +57,9 @@ const optionsFromEnvPlugin = async (passthrough) => {
 	options.set(reactServerComponents, stringToBoolean(process.env.REACT_SERVER_COMPONENTS ?? false));
 	options.set(serverNodeArgs, JSON.parse(process.env.SERVER_NODE_ARGS ?? JSON.stringify(["--inspect=0.0.0.0:9229"])));
 
+	options.set(minimize, stringToBoolean(process.env.MINIMIZE ?? isProduction));
+	options.set(minimizeNode, stringToBoolean(process.env.MINIMIZE_NODE ?? getMinimize()));
+	options.set(minimizeBrowser, stringToBoolean(process.env.MINIMIZE_BROWSER ?? getMinimize()));
 
 	console.log("options", options);
 

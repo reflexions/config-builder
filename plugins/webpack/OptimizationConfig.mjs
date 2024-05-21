@@ -2,14 +2,21 @@ import TerserPlugin from 'terser-webpack-plugin';
 import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
 import {
 	getIsProduction,
+	getMinimize,
+	getMinimizeNode,
+	getMinimizeBrowser,
 } from "../context-providers/options/Options.mjs";
 
-import { getIsNode } from "./SeparateNodeAndBrowserBuilds.mjs";
+import {
+	getIsBrowser,
+	getIsNode,
+} from "./SeparateNodeAndBrowserBuilds.mjs";
 import {
 	getHook,
 	getHookFnResult,
 } from "../../RunPlugins.mjs";
 
+export const cssMinifierEnabledHook = Symbol("cssMinifierEnabledHook");
 export const cssMinifierNameHook = Symbol("cssMinifierNameHook");
 export const cssMinifierPluginInstanceHook = Symbol("cssMinifierPluginInstanceHook");
 
@@ -112,7 +119,13 @@ const optimizationConfig = async ({ config, isProduction, isNode }) => {
 		...config,
 
 		optimization: {
-			minimize: isProduction,
+			minimize: getHookFnResult(cssMinifierEnabledHook, () => (
+				getIsBrowser()
+					? getMinimizeBrowser()
+					: getIsNode()
+						? getMinimizeNode()
+						: getMinimize()
+			)),
 			providedExports: isProduction,
 			removeAvailableModules: isProduction,
 			removeEmptyChunks: isProduction,
