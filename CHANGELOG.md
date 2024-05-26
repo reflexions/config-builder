@@ -1,4 +1,4 @@
-# MTA OMNY Changelog
+# Config Builder Changelog
 
 ## [Unreleased]
 

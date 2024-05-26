@@ -61,7 +61,7 @@ const optionsFromEnvPlugin = async (passthrough) => {
 	options.set(minimizeNode, stringToBoolean(process.env.MINIMIZE_NODE ?? getMinimize()));
 	options.set(minimizeBrowser, stringToBoolean(process.env.MINIMIZE_BROWSER ?? getMinimize()));
 
-	console.log("options", options);
+	console.log({ options });
 
 	return passthrough;
 };
