@@ -20,6 +20,7 @@ import {
 	serverNodeArgs,
 	shouldCalculateResourceIntegrity,
 	shouldUseReactRefreshSymbol,
+	dryRun,
 } from "./Options.mjs";
 import optionsContext from "./OptionsContext.mjs";
 
@@ -60,6 +61,8 @@ const optionsFromEnvPlugin = async (passthrough) => {
 	options.set(minimize, stringToBoolean(process.env.MINIMIZE ?? isProduction));
 	options.set(minimizeNode, stringToBoolean(process.env.MINIMIZE_NODE ?? getMinimize()));
 	options.set(minimizeBrowser, stringToBoolean(process.env.MINIMIZE_BROWSER ?? getMinimize()));
+
+	options.set(dryRun, stringToBoolean(process.env.DRY_RUN ?? false));
 
 	console.log({ options });
 

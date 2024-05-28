@@ -11,6 +11,7 @@
 		"./plugin-sets/*.mjs": "./plugin-sets/*.mjs",
 		"./plugins/hooks/*.mjs": "./plugins/hooks/*.mjs",
 		"./plugins/context-providers/*/*.mjs": "./plugins/context-providers/*/*.mjs",
+		"./plugins/context-providers/options/*.mjs": "./plugins/context-providers/options/*.mjs",
 		"./plugins/webpack/*.mjs": "./plugins/webpack/*.mjs",
 		"./plugins/webpack/file-types/*.mjs": "./plugins/webpack/file-types/*.mjs",
 		"./plugins/webpack/hmr/HmrClient.mjs": "./plugins/hmr/HmrClient.mjs",

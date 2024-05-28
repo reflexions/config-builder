@@ -49,7 +49,7 @@ const attachHmrServer = async config => {
 				restartable: !isProduction,
 				verbose: true,
 			})))),
-		],
+		].filter(x => x),
 
 		watch: !isProduction,
 		watchOptions: {

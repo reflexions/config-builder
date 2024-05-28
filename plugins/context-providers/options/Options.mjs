@@ -26,6 +26,8 @@ export const reactServerComponents = Symbol('reactServerComponents');
 export const getReactServerComponents = () => optionsContext.getStore().get(reactServerComponents);
 export const serverNodeArgs = Symbol('serverNodeArgs');
 export const getServerNodeArgs = () => optionsContext.getStore().get(serverNodeArgs);
+export const dryRun = Symbol('dryRun');
+export const getDryRun = () => optionsContext.getStore().get(dryRun);
 
 /**
  * The default minification-enabled toggle. Set by MINIMIZE env var. Defaults to true if prod, false otherwise.

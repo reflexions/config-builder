@@ -1,6 +1,14 @@
 import webpackContext from "../context-providers/webpack/WebpackContext.mjs";
+import {
+	dryRun,
+} from "../context-providers/options/Options.mjs";
+import { getHook } from "../../RunPlugins.mjs";
 
 const webpackCompile = (config) => {
+	if (getHook(dryRun)) {
+		return config;
+	}
+
 	return new Promise((resolve, reject) => {
 		const webpack = webpackContext.getStore();
 		webpack(config, (configError, stats) => {
