@@ -24,3 +24,6 @@ RUN $(yarn bin)/eslint .
 FROM base as circular-dependency-check
 
 RUN $(yarn bin)/madge --circular ./ConfigBuilder.mjs
+
+# todo fix the circular reference found here:
+#RUN $(yarn bin)/madge --circular ./plugin-sets/ReactSsrPlugin.mjs

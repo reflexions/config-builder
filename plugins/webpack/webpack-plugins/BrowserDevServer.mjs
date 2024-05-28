@@ -1,9 +1,5 @@
 import WebpackDevServer from "webpack-dev-server";
 import { errorLog } from "../../../razzle-libs/logger.mjs";
-import {
-	getHmrClientListenPort,
-	getListenHost,
-} from "../../context-providers/options/Options.mjs";
 import { browserDevServerConfig } from "../hmr/HmrClient.mjs";
 
 let once = false;
