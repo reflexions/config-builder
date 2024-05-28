@@ -4,6 +4,13 @@
 script_dir="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )" || exit 1
 cd "$script_dir" || exit 1
 
+# there's a lot to fix
+#step="eslint"
+#docker build . --progress plain --pull --target eslint || { echo "$step failed"; exit 1; }
+
+step="circular-dependency-check"
+docker build . --pull --target circular-dependency-check || { echo "$step failed"; exit 1; }
+
 git diff-index --quiet HEAD --
 has_changes=$?
 
@@ -14,17 +21,17 @@ fi
 
 # bump the version for npm
 echo "What type of update is this?"
-echo "Options are: A (major), I (minor), P (patch)"
+echo "Options are: A/1 (major), I/2 (minor), P/3 (patch)"
 
 read -p "Type: " -n 1 -r
 echo ''
 
 version=
-if [[ $REPLY =~ ^[Aa]$ ]]; then
+if [[ $REPLY =~ ^[Aa1]$ ]]; then
 	version=$(npm version major)
-elif [[ $REPLY =~ ^[Ii]$ ]]; then
+elif [[ $REPLY =~ ^[Ii2]$ ]]; then
 	version=$(npm version minor)
-elif [[ $REPLY =~ ^[Pp]$ ]]; then
+elif [[ $REPLY =~ ^[Pp3]$ ]]; then
 	version=$(npm version patch)
 else
 	echo "Invalid option provided as update type. Valid options are: A, I, P."

@@ -27,6 +27,20 @@
 	"author": "Reflexions Data, LLC",
 	"license": "ISC",
 	"sideEffects": false,
+	"devDependencies": {
+		"@babel/core": "^7.24.6",
+		"@babel/eslint-parser": "^7.24.6",
+		"@babel/eslint-plugin": "^7.24.6",
+		"@emotion/eslint-plugin": "^11.11.0",
+		"@stylistic/eslint-plugin-js": "^2.1.0",
+		"eslint": "^9.3.0",
+		"eslint-plugin-css-modules": "^2.12.0",
+		"eslint-plugin-import": "^2.29.1",
+		"eslint-plugin-react": "^7.34.2",
+		"eslint-plugin-react-hooks": "^4.6.2",
+		"globals": "^15.3.0",
+		"madge": "^7.0.0"
+	},
 	"peerDependencies": {
 		"@csstools/postcss-global-data": "^2.1.1",
 		"@reflexions/string-to-boolean": "^1.0.0",
