@@ -7,6 +7,9 @@ import postcssNesting from "postcss-nesting";
 import postcssReporter from 'postcss-reporter';
 import postcssCustomMedia from 'postcss-custom-media';
 import autoprefixer from "autoprefixer";
+import postcssExtend from 'postcss-extend';
+import tailwind from 'tailwindcss';
+import tailwindNesting from 'tailwindcss/nesting/index.js';
 import {
 	getHook,
 	getHookFnResult,
@@ -18,6 +21,17 @@ import {
 } from "../../context-providers/paths/Paths.mjs";
 
 export const postcssGlobalDataFilesHook = Symbol("postcssGlobalDataFilesHook");
+export const postcssExtendEnabledHook = Symbol("postcssExtendEnabledHook");
+export const postcssExtendHook = Symbol("postcssExtendHook");
+export const postcssCustomMediaEnabledHook = Symbol("postcssCustomMediaEnabledHook");
+export const postcssCustomMediaHook = Symbol("postcssCustomMediaHook");
+export const tailwindEnabledHook = Symbol("tailwindEnabledHook");
+export const tailwindNestingEnabledHook = Symbol("tailwindNestingEnabledHook");
+export const tailwindHook = Symbol("tailwindHook");
+export const tailwindNestingHook = Symbol("tailwindNestingHook");
+export const postcssNestingEnabledHook = Symbol("postcssNestingEnabledHook");
+export const postcssNestingHook = Symbol("postcssNestingHook");
+
 
 const cssConfig = async ({ config, isProduction, isNode }) => {
 
@@ -134,11 +148,50 @@ const cssConfig = async ({ config, isProduction, isNode }) => {
 													]),
 												}),
 
-												postcssCustomMedia({
-													// https://github.com/csstools/postcss-plugins/tree/main/plugins/postcss-custom-media#options
-												}),
+												...(
+													getHook(postcssExtendEnabledHook, false)
+														? await getHookFnResult(postcssExtendHook, () => [
+															postcssExtend()
+														])
+														: []
+												),
 
-												postcssNesting(),
+												...(
+													getHook(postcssCustomMediaEnabledHook, true)
+														? await getHookFnResult(postcssCustomMediaHook, () => [
+															postcssCustomMedia({
+																// https://github.com/csstools/postcss-plugins/tree/main/plugins/postcss-custom-media#options
+															})
+														])
+														: []
+												),
+
+												...(
+													getHook(tailwindEnabledHook, false)
+														? await getHookFnResult(tailwindHook, async () => [
+															...(
+																getHook(tailwindNestingEnabledHook, true)
+																	? getHookFnResult(tailwindNestingHook, () => [
+																		tailwindNesting(), // uses postcss-nested
+																	])
+																	: []
+															),
+
+															// Generates utility classes based on tailwind.config.js
+															// this path must be valid on fe and cms (for the gutenberg build)
+															tailwind((await import((process.env.FRONTEND_BUILD_ROOT || '/var/www/html') + '/tailwind.config.mjs')).default),
+														])
+														: []
+												),
+
+												...(
+													getHook(postcssNestingEnabledHook, true)
+														? await getHookFnResult(postcssNestingHook, () => [
+															postcssNesting(),
+														])
+														: []
+												)
+
 
 												(isProduction || old_browser_compat) && !isNode && autoprefixer({
 													// https://github.com/postcss/autoprefixer#options

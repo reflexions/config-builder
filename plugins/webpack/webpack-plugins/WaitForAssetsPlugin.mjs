@@ -2,12 +2,19 @@ import { setTimeout } from 'node:timers/promises';
 import { access, readFile } from 'node:fs/promises';
 import { constants } from "node:fs";
 import { getAppAssetsManifest } from "../../context-providers/paths/Paths.mjs";
+import {
+	getHook,
+	getHookFnResult,
+} from "RunPlugins.mjs";
+
+export const waitAttempts = Symbol('waitAttempts');
+export const waitRetryTime = Symbol('waitRetryTime');
 
 const pluginName = "WaitForAssetsPlugin";
 const waitForAssetsJson = async () => {
 	let attempts = 0;
 	let done = false;
-	const retryTime = 1_000;
+	const retryTime = getHookFnResult(waitRetryTime, () => 1_000);
 	await new Promise(async (resolve, reject) => {
 		const browserAssetsJson = getAppAssetsManifest();
 		do {
@@ -19,7 +26,7 @@ const waitForAssetsJson = async () => {
 				resolve();
 			}
 			catch (error) {
-				if (attempts > 300) {
+				if (attempts > getHookFnResult(waitAttempts, () => 300)) {
 					console.error(`${pluginName} gave up waiting`);
 					console.error(error);
 					done = true;
