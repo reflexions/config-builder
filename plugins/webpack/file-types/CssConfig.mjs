@@ -36,11 +36,12 @@ export const postcssNestingHook = Symbol("postcssNestingHook");
 const cssConfig = async ({ config, isProduction, isNode }) => {
 
 	const srcDir = getAppSrc();
+	const tailwindEnabled = getHook(tailwindEnabledHook, false);
 
 	// we only do postcss on server build if using tailwind
 	// (needed so server build can understand tailwind's @apply)
-	// but we're not doing that here, so only need it on client build
-	const usePostcss = !isNode;
+	// always do it on the client build
+	const usePostcss = !isNode || tailwindEnabled;
 
 	const old_browser_compat = isProduction;
 
@@ -167,7 +168,7 @@ const cssConfig = async ({ config, isProduction, isNode }) => {
 												),
 
 												...(
-													getHook(tailwindEnabledHook, false)
+													tailwindEnabled
 														? await getHookFnResult(tailwindHook, async () => [
 															...(
 																getHook(tailwindNestingEnabledHook, true)
