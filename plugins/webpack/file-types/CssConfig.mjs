@@ -190,8 +190,7 @@ const cssConfig = async ({ config, isProduction, isNode }) => {
 															postcssNesting(),
 														])
 														: []
-												)
-
+												),
 
 												(isProduction || old_browser_compat) && !isNode && autoprefixer({
 													// https://github.com/postcss/autoprefixer#options
@@ -204,7 +203,7 @@ const cssConfig = async ({ config, isProduction, isNode }) => {
 													clearMessages: false,
 													throwError: true,
 												}),
-											],
+											].filter(x => x),
 											sourceMap: true,
 										},
 									},
