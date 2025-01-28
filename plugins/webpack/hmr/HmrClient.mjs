@@ -11,16 +11,28 @@ import {
 	getAppAssetsManifest,
 	getConfigBuilderDir,
 } from "../../context-providers/paths/Paths.mjs";
-import { getHook } from "../../../RunPlugins.mjs";
+import {
+	getHook,
+	getHookFnResult,
+} from "../../../RunPlugins.mjs";
 import BrowserDevServerPlugin from "../webpack-plugins/BrowserDevServer.mjs";
 
 export const browserDevServerConfigSymbol = Symbol("browserDevServerConfigSymbol");
+export const browserDevServerHeadersSymbol = Symbol("browserDevServerHeadersSymbol");
+export const browserDevServerClientOverlaySymbol = Symbol("browserDevServerClientOverlaySymbol");
+export const browserDevServerClientProgressSymbol = Symbol("browserDevServerClientProgressSymbol");
+export const browserDevServerWatchSymbol = Symbol("browserDevServerWatchSymbol");
+
+export const attachHmrClientSymbol = Symbol("attachHmrClientSymbol");
+export const attachHmrClientWatchIgnoreSymbol = Symbol("attachHmrClientWatchIgnoreSymbol");
+export const attachHmrClientWatchOptionsSymbol = Symbol("attachHmrClientWatchOptionsSymbol");
+
 export const browserDevServerConfig = () => getHook(browserDevServerConfigSymbol, ({
 	compress: true,
-	headers: {
+	headers: getHook(browserDevServerHeadersSymbol, {
 		"Access-Control-Allow-Origin": "*",
 		"Cross-Origin-Resource-Policy": "same-site",
-	},
+	}),
 	historyApiFallback: {
 		disableDotRule: true,
 	},
@@ -30,21 +42,21 @@ export const browserDevServerConfig = () => getHook(browserDevServerConfigSymbol
 	allowedHosts: "all",
 	client: {
 		logging: 'verbose',
-		overlay: false, // on hot reload, shows until both client + dev builds are complete
-		progress: true,
+		overlay: getHook(browserDevServerClientOverlaySymbol, false), // on hot reload, shows until both client + dev builds are complete
+		progress: getHook(browserDevServerClientProgressSymbol, true),
 	},
 	devMiddleware: {
 		publicPath: getHmrClientPublicUrl().href,
 	},
 	static: {
-		watch: {
+		watch: getHook(browserDevServerWatchSymbol, {
 			ignored: /node_modules/,
-		},
+		}),
 	},
 }));
 
 const attachHmrClientCrumb = Symbol("attachHmrClientCrumb");
-const attachHmrClient = async config => {
+const attachHmrClient = await getHookFnResult(attachHmrClientSymbol, async config => {
 	const isProduction = getIsProduction();
 
 	if (isProduction) {
@@ -78,14 +90,19 @@ const attachHmrClient = async config => {
 		watch: true,
 		watchOptions: {
 			ignored: [
-				"**/node_modules",
+				...getHook(attachHmrClientWatchIgnoreSymbol, [
+					"**/node_modules",
+				]),
 				getAppAssetsManifest(),
 			],
-			//aggregateTimeout: 500,
-			//poll: false,
+
+			...getHook(attachHmrClientWatchOptionsSymbol, {
+				//aggregateTimeout: 500,
+				//poll: false,
+			}),
 		},
 	};
-};
+});
 
 export default {
 	name: attachHmrClient.name,

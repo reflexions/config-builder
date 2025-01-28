@@ -17,6 +17,7 @@ const attachHmrServerCrumb = Symbol("attachHmrServerCrumb");
 const startServerPluginHook = Symbol("startServerPluginHook");
 const startServerPluginArgsHook = Symbol("startServerPluginArgsHook");
 const startServerPluginNodeArgsHook = Symbol("startServerPluginNodeArgsHook");
+const attachHmrServerWatchIgnoreSymbol = Symbol("attachHmrServerWatchIgnoreSymbol");
 
 const ourResolve = async path => new URL(await resolve(path, import.meta.url)).pathname;
 
@@ -54,7 +55,9 @@ const attachHmrServer = async config => {
 		watch: !isProduction,
 		watchOptions: {
 			ignored: [
-				"**/node_modules",
+				...getHook(attachHmrServerWatchIgnoreSymbol, [
+					"**/node_modules",
+				]),
 				// server build does listen for changes to client's assets.json
 			],
 			aggregateTimeout: 500,
