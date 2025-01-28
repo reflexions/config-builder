@@ -56,7 +56,7 @@ export const browserDevServerConfig = () => getHook(browserDevServerConfigSymbol
 }));
 
 const attachHmrClientCrumb = Symbol("attachHmrClientCrumb");
-const attachHmrClient = await getHookFnResult(attachHmrClientSymbol, async config => {
+const attachHmrClient = async config => await getHookFnResult(attachHmrClientSymbol, async config => {
 	const isProduction = getIsProduction();
 
 	if (isProduction) {
@@ -102,7 +102,7 @@ const attachHmrClient = await getHookFnResult(attachHmrClientSymbol, async confi
 			}),
 		},
 	};
-});
+}, [ config ]);
 
 export default {
 	name: attachHmrClient.name,
