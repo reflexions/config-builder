@@ -1,4 +1,4 @@
-FROM node:lts as base
+FROM node:lts AS base
 
 WORKDIR /workspace
 ENV NODE_ENV=production
@@ -13,7 +13,7 @@ COPY . .
 
 
 # =================================================
-FROM base as eslint
+FROM base AS eslint
 
 ENV NODE_ENV=development
 
@@ -21,7 +21,7 @@ RUN $(yarn bin)/eslint .
 
 
 # =================================================
-FROM base as circular-dependency-check
+FROM base AS circular-dependency-check
 
 RUN $(yarn bin)/madge --circular ./ConfigBuilder.mjs
 
