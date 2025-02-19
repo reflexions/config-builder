@@ -23,7 +23,7 @@ const highestVersionSupportedByBrowserslist = (majorVersion, minorVersion) => {
 	return nodeVersionSplit[ 0 ] + '.' + nodeVersionSplit[ 1 ];
 };
 
-const defaultBrowserslistNodeTarget = 'node ' + highestVersionSupportedByBrowserslist(nodeVersionSplit[ 0 ], nodeVersionSplit[ 1 ]);
+export const defaultBrowserslistNodeTarget = 'node ' + highestVersionSupportedByBrowserslist(nodeVersionSplit[ 0 ], nodeVersionSplit[ 1 ]);
 
 // Module HMR not supported yet https://github.com/webpack/webpack/issues/17636#issuecomment-1862935581
 const outputModules = false;
@@ -31,7 +31,7 @@ const outputModules = false;
 const nodeConfig = async ({ config, isProduction }) => ({
 	...config,
 
-	target: await getHookFnResult(getNodeTargetHook),
+	target: await getHookFnResult(getNodeTargetHook, () => defaultWebpackNodeTarget),
 	entry: {
 		"server": [
 			//"/var/www/html/node_modules/razzle-dev-utils/prettyNodeErrors.js",
@@ -121,8 +121,4 @@ export default {
 	name: attachNodeConfig.name,
 	main: attachNodeConfig,
 	crumb: attachNodeConfigCrumb,
-	hooks: new Map([
-		[ getNodeTargetHook, () => defaultWebpackNodeTarget ],
-		[ getNodeTargetsHook, () => defaultBrowserslistNodeTarget ],
-	]),
 };

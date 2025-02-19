@@ -29,7 +29,7 @@ const browserConfig = async ({ config, isProduction }) => {
 	return ({
 		...config,
 
-		target: await getHookFnResult(getBrowserTargetHook),
+		target: await getHookFnResult(getBrowserTargetHook, () => "web"),
 		entry: {
 			client: [
 				"/var/www/html/src/client.js",
@@ -113,20 +113,4 @@ export default {
 	name: attachBrowserConfig.name,
 	main: attachBrowserConfig,
 	crumb: attachBrowserConfigCrumb,
-	hooks: new Map([
-		[ getBrowserTargetHook, () => "web" ],
-		[ getBrowserTargetsHook, () => getIsProduction()
-			? [
-				">1%",
-				"not dead",
-				"Firefox ESR",
-				//"ie 11",
-			]
-			: [
-				"last 2 Chrome versions",
-				"last 2 Firefox versions",
-				"last 1 Safari version"
-			]
-		],
-	]),
 };
