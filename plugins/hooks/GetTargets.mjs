@@ -4,7 +4,7 @@ import {
 	getNodeTargetsHook,
 } from "../webpack/NodeConfig.mjs";
 import { getBrowserTargetsHook } from "../webpack/BrowserConfig.mjs";
-import { getIsProduction } from "plugins/context-providers/options/Options.mjs";
+import { getIsProduction } from "../context-providers/options/Options.mjs";
 
 const getTargets = async (isNode) => isNode
 	? await getHookFnResult(getNodeTargetsHook, () => defaultBrowserslistNodeTarget)
