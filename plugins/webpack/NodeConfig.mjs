@@ -20,11 +20,6 @@ const nodeVersionSplit = nodeVersion.split('.');
 const defaultWebpackNodeTarget = 'async-node' + nodeVersionSplit[ 0 ] + '.' + nodeVersionSplit[ 1 ];
 
 const highestVersionSupportedByBrowserslist = (majorVersion, minorVersion) => {
-	majorVersion = parseInt(majorVersion, 10);
-	minorVersion = parseInt(minorVersion, 10);
-	if (majorVersion > 20 || (majorVersion === 20 && minorVersion > 4)) {
-		return "20.4";
-	}
 	return nodeVersionSplit[ 0 ] + '.' + nodeVersionSplit[ 1 ];
 };
 
