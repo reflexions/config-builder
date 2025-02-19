@@ -9,7 +9,6 @@ import {
 	getHook,
 	getHookFnResult,
 } from "../../../RunPlugins.mjs";
-import { resolve } from "import-meta-resolve";
 
 const attachHmrServerCrumb = Symbol("attachHmrServerCrumb");
 
@@ -19,7 +18,7 @@ const startServerPluginArgsHook = Symbol("startServerPluginArgsHook");
 const startServerPluginNodeArgsHook = Symbol("startServerPluginNodeArgsHook");
 const attachHmrServerWatchIgnoreSymbol = Symbol("attachHmrServerWatchIgnoreSymbol");
 
-const ourResolve = async path => new URL(await resolve(path, import.meta.url)).pathname;
+const ourResolve = path => new URL(import.meta.resolve(path)).pathname;
 
 const attachHmrServer = async config => {
 	const isProduction = getIsProduction();
@@ -44,7 +43,7 @@ const attachHmrServer = async config => {
 				killTimeout: 1000,
 				nodeArgs: getHook(startServerPluginNodeArgsHook, ([
 					...getServerNodeArgs(),
-					'-r', await ourResolve("source-map-support/register"),
+					'-r', ourResolve("source-map-support/register"),
 					...(getReactServerComponents() ? ['--conditions=react-server'] : []),
 				])),
 				restartable: !isProduction,
