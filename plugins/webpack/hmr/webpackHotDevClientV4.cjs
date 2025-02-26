@@ -15,16 +15,13 @@
 // note that Webpack doesn't support HMR for modules yet, so this file is cjs
 const stripAnsi = require("strip-ansi");
 const launchEditorEndpoint = require("react-dev-utils/launchEditorEndpoint.js");
-const formatWebpackMessages = require("./formatWebpackMessages.mjs");
+const formatWebpackMessages = require("./formatWebpackMessages.mjs").default;
 
 const ErrorOverlay = require("react-error-overlay");
 //--- START Unique code ---
 // This code is unique to webpack-dev-server v4
 // The single API changed to 2 APIs in v4, first you parse the URL, then you create the socket URL from the parsed data
-// These APIs are accessible from the `default` context
-const parseURL = require("webpack-dev-server/client/utils/parseURL").default;
-
-const createSocketURL = require("webpack-dev-server/client/utils/createSocketURL").default;
+const { createSocketURL, parseURL } = require("webpack-dev-server/client");
 
 const socketUrl = createSocketURL(parseURL());
 
