@@ -2,9 +2,9 @@ import baseWebpackConfig from '../plugins/webpack/BaseWebpackConfig.mjs';
 import runPlugins, { getHookFnResult } from "../RunPlugins.mjs";
 import separateNodeAndBrowserBuilds, {
 	buildBrowserConfig,
-	buildNode,
 	buildNodeConfig,
 	getBuildBrowser,
+	getBuildNode,
 } from "../plugins/webpack/SeparateNodeAndBrowserBuilds.mjs";
 import optionsFromEnvPlugin from "../plugins/context-providers/options/OptionsFromEnvPlugin.mjs";
 import pathsFromEnvPlugin from "../plugins/context-providers/paths/PathsFromEnvPlugin.mjs";
