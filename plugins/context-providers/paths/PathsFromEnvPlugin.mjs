@@ -25,7 +25,9 @@ export const appDirBuilderSyncHook = Symbol("appDirBuilderHook");
 const pathsFromEnvPlugin = async (passthrough) => {
 	const paths = pathsContext.getStore();
 
-	const appDirBuilder = getHook(appDirBuilderSyncHook);
+	const appDirBuilder = getHook(appDirBuilderSyncHook, (relativePath) =>
+		path.resolve((process.env.FRONTEND_BUILD_ROOT || '/var/www/html'), relativePath)
+	);
 
 	paths.set(dotEnvSymbol, appDirBuilder('.env'));
 	paths.set(appDirSymbol, appDirBuilder('.'));
@@ -51,7 +53,4 @@ export default {
 	name: pathsFromEnvPlugin.name,
 	main: (passthrough) => pathsFromEnvPlugin(passthrough),
 	crumb: pathsFromEnvCrumb,
-	hooks: new Map([
-		[ appDirBuilderSyncHook, (relativePath) => path.resolve((process.env.FRONTEND_BUILD_ROOT || '/var/www/html'), relativePath) ],
-	]),
 };
