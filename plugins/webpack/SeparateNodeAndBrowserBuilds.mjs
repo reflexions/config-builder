@@ -18,7 +18,9 @@ export const targetPlatforms = {
 
 
 export const buildNode = Symbol('buildNode');
+export const getBuildNode = () => getHook(buildNode, true);
 export const buildBrowser = Symbol('buildBrowser');
+export const getBuildBrowser = () => getHook(buildBrowser, true);
 
 export const buildNodeConfig = Symbol('buildNodeConfig');
 export const buildBrowserConfig = Symbol('buildBrowserConfig');
@@ -31,13 +33,13 @@ export const getIsBrowser = () => targetPlatformContext.getStore() === targetPla
 const separateNodeAndBrowserBuilds = async () => {
 	const options = optionsContext.getStore();
 
-	const browserConfig = getHook(buildNode, true)
+	const browserConfig = getBuildBrowser()
 		&& await targetPlatformContext.run(targetPlatforms.browser, async () =>
 			await getHookFnResult(buildBrowserConfig, () => null),
 		);
 	options.set(hasBrowserBuildSymbol, Boolean(browserConfig));
 
-	const nodeConfig = getHook(buildBrowser, true)
+	const nodeConfig = getBuildNode()
 		&& await targetPlatformContext.run(targetPlatforms.node, async () =>
 			await getHookFnResult(buildNodeConfig, () => null),
 		);

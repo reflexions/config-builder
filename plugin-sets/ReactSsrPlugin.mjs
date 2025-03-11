@@ -2,7 +2,9 @@ import baseWebpackConfig from '../plugins/webpack/BaseWebpackConfig.mjs';
 import runPlugins, { getHookFnResult } from "../RunPlugins.mjs";
 import separateNodeAndBrowserBuilds, {
 	buildBrowserConfig,
+	buildNode,
 	buildNodeConfig,
+	getBuildBrowser,
 } from "../plugins/webpack/SeparateNodeAndBrowserBuilds.mjs";
 import optionsFromEnvPlugin from "../plugins/context-providers/options/OptionsFromEnvPlugin.mjs";
 import pathsFromEnvPlugin from "../plugins/context-providers/paths/PathsFromEnvPlugin.mjs";
@@ -60,17 +62,23 @@ const reactSsrPlugin = async () => await runPlugins([
 						name: "browser-and-node-builds",
 						crumb: Symbol("browser-and-node-builds"),
 						hooks: new Map([
-							[ buildBrowserConfig, async () => await runPlugins([
-								...sharedPlugins,
-								browserConfig,
-								assetsManifestConfig,
-								!getIsProduction() && hmrClient,
-							].filter(x => x)) ],
-							[ buildNodeConfig, async () => await runPlugins([
-								...sharedPlugins,
-								nodeConfig,
-								!getIsProduction() && hmrServer,
-							].filter(x => x)) ],
+							[ buildBrowserConfig, async () => getBuildBrowser()
+								? await runPlugins([
+									...sharedPlugins,
+									browserConfig,
+									assetsManifestConfig,
+									!getIsProduction() && hmrClient,
+								].filter(x => x))
+								: []
+							],
+							[ buildNodeConfig, async () => getBuildNode()
+								? await runPlugins([
+									...sharedPlugins,
+									nodeConfig,
+									!getIsProduction() && hmrServer,
+								].filter(x => x))
+								: []
+							],
 						]),
 					},
 					...await getHookFnResult(preCompilePluginsHook, async () => []),

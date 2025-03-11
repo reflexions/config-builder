@@ -122,9 +122,6 @@ const javascriptConfig = async ({ config, isProduction, isNode }) => {
 					exclude: [
 						/node_modules/,
 					],
-					include: [
-						"/var/www/html/src",
-					],
 					test: /\.(js|jsx|mjs|ts|tsx)$/,
 					use: [
 						{

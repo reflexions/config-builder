@@ -17,10 +17,15 @@ import { silentMkdir } from "../../utils/silentMkdir.mjs";
 export const getBrowserTargetHook = Symbol("getBrowserTargetHook");
 /* https://babeljs.io/docs/options#targets */
 export const getBrowserTargetsHook = Symbol("getBrowserTargetsHook");
+
+export const getBrowserEntryHook = Symbol("getBrowserEntryHook");
 export const getBrowserOutputFilenameHook = Symbol("getBrowserOutputFilenameHook");
+export const getBrowserOutputPublicPathHook = Symbol("getBrowserOutputPublicPathHook");
+export const getBrowserOutputPathHook = Symbol("getBrowserOutputPathHook");
 export const getBrowserOutputChunkFilenameHook = Symbol("getBrowserOutputChunkFilenameHook");
 export const getBrowserLibraryTargetHook = Symbol("getBrowserLibraryTargetHook");
 
+const buildRoot = (process.env.FRONTEND_BUILD_ROOT || '/var/www/html');
 
 const browserConfig = async ({ config, isProduction }) => {
 	// make sure the dir that we're going to copy into (/var/www/html/build/public) exists
@@ -30,18 +35,18 @@ const browserConfig = async ({ config, isProduction }) => {
 		...config,
 
 		target: await getHookFnResult(getBrowserTargetHook, () => "web"),
-		entry: {
+		entry: await getHookFnResult(getBrowserEntryHook, () => ({
 			client: [
-				"/var/www/html/src/client.js",
+				buildRoot + "/src/client.js",
 			],
-		},
+		})),
 		output: {
 			...config.output,
 
-			path: "/var/www/html/build/public",
-			publicPath: isProduction
+			path: await getHookFnResult(getBrowserOutputPathHook, () => "/var/www/html/build/public"),
+			publicPath: await getHookFnResult(getBrowserOutputPublicPathHook, () => isProduction
 				? '/'
-				: getHmrClientPublicUrl().href,
+				: getHmrClientPublicUrl().href),
 			filename: await getHookFnResult(getBrowserOutputFilenameHook, () => `static/js/[name].${isProduction
 				? '[contenthash:8].'
 				: ''}js`),

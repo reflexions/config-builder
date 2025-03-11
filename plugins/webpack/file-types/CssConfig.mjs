@@ -31,7 +31,8 @@ export const tailwindHook = Symbol("tailwindHook");
 export const tailwindNestingHook = Symbol("tailwindNestingHook");
 export const postcssNestingEnabledHook = Symbol("postcssNestingEnabledHook");
 export const postcssNestingHook = Symbol("postcssNestingHook");
-
+export const sassLoaderEnabledHook = Symbol("sassLoaderEnabledHook");
+export const sassLoaderConfigHook = Symbol("sassLoaderConfigHook");
 
 const cssConfig = async ({ config, isProduction, isNode }) => {
 
@@ -42,8 +43,13 @@ const cssConfig = async ({ config, isProduction, isNode }) => {
 	// (needed so server build can understand tailwind's @apply)
 	// always do it on the client build
 	const usePostcss = !isNode || tailwindEnabled;
+	const useSassLoader = getHook(sassLoaderEnabledHook, false);
 
 	const old_browser_compat = isProduction;
+
+	let importLoaders = 0;
+	if (useSassLoader) { importLoaders++; }
+	if (usePostcss) { importLoaders++; }
 
 	return ({
 		...config,
@@ -64,7 +70,7 @@ const cssConfig = async ({ config, isProduction, isNode }) => {
 				...config.module?.rules ?? [],
 
 				{
-					test: /\.css$/,
+					test: /\.s?css$/,
 					use: [
 						...(isNode
 								? []
@@ -91,9 +97,7 @@ const cssConfig = async ({ config, isProduction, isNode }) => {
 							options: {
 								esModule: true,
 
-								importLoaders: usePostcss
-									? 1
-									: 0,
+								importLoaders,
 
 								modules: {
 									// https://webpack.js.org/loaders/css-loader/#modules
@@ -126,6 +130,15 @@ const cssConfig = async ({ config, isProduction, isNode }) => {
 								sourceMap: true,
 							},
 						},
+						...(useSassLoader // should come before postcss in this list (i.e. postcss runs first)
+							? [ {
+								ident: "sass-loader",
+								loader: "sass-loader",
+								...getHook(sassLoaderConfigHook, ({
+								})),
+							}]
+							: []
+						),
 						...(usePostcss
 								? [ {
 									ident: "postcss-loader",

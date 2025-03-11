@@ -49,8 +49,8 @@ const logConfigPlugin = async (basePath, config) => {
 		value: RegExp.prototype.toString,
 	});
 
-	await writeFile(`${basePath}/client-${prodOrDev}.config.json`, JSON.stringify(config[ 0 ], jsonStringifyToObjectReplacer, '\t'));
-	await writeFile(`${basePath}/server-${prodOrDev}.config.json`, JSON.stringify(config[ 1 ], jsonStringifyToObjectReplacer, '\t'));
+	await writeFile(`${basePath}/client-${prodOrDev}.config.json`, JSON.stringify(config[ 0 ] ?? "", jsonStringifyToObjectReplacer, '\t'));
+	await writeFile(`${basePath}/server-${prodOrDev}.config.json`, JSON.stringify(config[ 1 ] ?? "", jsonStringifyToObjectReplacer, '\t'));
 
 	console.info(JSON.stringify({ config }, jsonStringifyToObjectReplacer, '\t'));
 

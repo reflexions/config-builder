@@ -32,6 +32,8 @@ export const fallback = Symbol("fallback");
 export const resolveSpread = Symbol("resolveSpread");
 export const baseConfigSpread = Symbol("baseConfigSpread");
 
+const buildRoot = (process.env.FRONTEND_BUILD_ROOT || '/var/www/html');
+
 const baseConfig = async ({ isProduction, isNode }) => ({
 	mode: await getHookFnResult(getModeHook, () => isProduction
 		? "production"
@@ -92,7 +94,7 @@ const baseConfig = async ({ isProduction, isNode }) => ({
 				"main",
 			],
 		modules: getHook(modules, [
-			"/var/www/html/src",
+			buildRoot + "/src",
 			// "/var/www/html/src/styles", // not needed now that we have postcssGlobalData importing this stuff automatically
 			"node_modules",
 		]),
@@ -102,8 +104,8 @@ const baseConfig = async ({ isProduction, isNode }) => ({
 		fallback: getHook(fallback, isNode
 			? {}
 			: {
-				crypto: "/var/www/html/node_modules/crypto-js/index.js",
-				stream: "/var/www/html/node_modules/stream-browserify/index.js",
+				crypto: buildRoot + "/node_modules/crypto-js/index.js",
+				stream: buildRoot + "/node_modules/stream-browserify/index.js",
 			}
 		),
 
@@ -111,7 +113,7 @@ const baseConfig = async ({ isProduction, isNode }) => ({
 	},
 	resolveLoader: {
 		modules: [
-			"/var/www/html/node_modules",
+			buildRoot + "/node_modules",
 		],
 		plugins: [],
 	},
