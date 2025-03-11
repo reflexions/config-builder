@@ -10,7 +10,7 @@
 		".": "./ConfigBuilder.mjs",
 		"./plugin-sets/*.mjs": "./plugin-sets/*.mjs",
 		"./plugins/hooks/*.mjs": "./plugins/hooks/*.mjs",
-		"./plugins/context-providers/*/*.mjs": "./plugins/context-providers/*/*.mjs",
+		"./plugins/context-providers/paths/*.mjs": "./plugins/context-providers/paths/*.mjs",
 		"./plugins/context-providers/options/*.mjs": "./plugins/context-providers/options/*.mjs",
 		"./plugins/webpack/*.mjs": "./plugins/webpack/*.mjs",
 		"./plugins/webpack/file-types/*.mjs": "./plugins/webpack/file-types/*.mjs",
