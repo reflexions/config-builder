@@ -24,6 +24,7 @@ export const getBrowserOutputPublicPathHook = Symbol("getBrowserOutputPublicPath
 export const getBrowserOutputPathHook = Symbol("getBrowserOutputPathHook");
 export const getBrowserOutputChunkFilenameHook = Symbol("getBrowserOutputChunkFilenameHook");
 export const getBrowserLibraryTargetHook = Symbol("getBrowserLibraryTargetHook");
+export const getBrowserPluginsHook = Symbol("getBrowserPluginsHook");
 export const getBrowserExternalsHook = Symbol("getBrowserExternalsHook");
 
 const buildRoot = (process.env.FRONTEND_BUILD_ROOT || '/var/www/html');
@@ -92,6 +93,8 @@ const browserConfig = async ({ config, isProduction }) => {
 
 		plugins: [
 			...config.plugins ?? [],
+
+			...await getHookFnResult(getBrowserPluginsHook, () => ([])),
 
 			new CopyPlugin({
 				patterns: [

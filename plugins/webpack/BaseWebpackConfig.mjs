@@ -28,6 +28,7 @@ export const hashFunction = Symbol("hashFunction");
 export const resolveAlias = Symbol("resolveAlias");
 export const extensions = Symbol("extensions");
 export const modules = Symbol("modules");
+export const plugins = Symbol("plugins");
 export const fallback = Symbol("fallback");
 export const resolveSpread = Symbol("resolveSpread");
 export const baseConfigSpread = Symbol("baseConfigSpread");
@@ -104,7 +105,7 @@ const baseConfig = async ({ isProduction, isNode }) => ({
 			// "/var/www/html/src/styles", // not needed now that we have postcssGlobalData importing this stuff automatically
 			"node_modules",
 		]),
-		plugins: [],
+		plugins: getHook(plugins, []),
 		unsafeCache: false,
 
 		fallback: getHook(fallback, isNode

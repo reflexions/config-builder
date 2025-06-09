@@ -12,6 +12,7 @@ export const getNodeTargetsHook = Symbol("getNodeTargetsHook");
 export const getNodeOutputFilenameHook = Symbol("getNodeOutputFilenameHook");
 export const getNodeOutputChunkFilenameHook = Symbol("getNodeOutputChunkFilenameHook");
 export const getNodeLibraryTargetHook = Symbol("getNodeLibraryTargetHook");
+export const getNodePluginsHook = Symbol("getNodePluginsHook");
 export const getNodeExternalsHook = Symbol("getNodeExternalsHook");
 
 const nodeVersion = process.versions.node;
@@ -107,6 +108,8 @@ const nodeConfig = async ({ config, isProduction }) => ({
 
 	plugins: [
 		...config.plugins ?? [],
+
+		...await getHookFnResult(getNodePluginsHook, () => ([])),
 
 		new WaitForAssetsPlugin(),
 	],
