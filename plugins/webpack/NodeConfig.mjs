@@ -12,6 +12,7 @@ export const getNodeTargetsHook = Symbol("getNodeTargetsHook");
 export const getNodeOutputFilenameHook = Symbol("getNodeOutputFilenameHook");
 export const getNodeOutputChunkFilenameHook = Symbol("getNodeOutputChunkFilenameHook");
 export const getNodeLibraryTargetHook = Symbol("getNodeLibraryTargetHook");
+export const getNodeExternalsHook = Symbol("getNodeExternalsHook");
 
 const nodeVersion = process.versions.node;
 const nodeVersionSplit = nodeVersion.split('.');
@@ -98,11 +99,11 @@ const nodeConfig = async ({ config, isProduction }) => ({
 		//css: true,
 	},
 
-	externals: {
+	externals: await getHookFnResult(getNodeExternalsHook, () => ({
 		appdynamics: "appdynamics",
 		'@newrelic/native-metrics': '@newrelic/native-metrics',
 		'newrelic': 'newrelic',
-	},
+	})),
 
 	plugins: [
 		...config.plugins ?? [],
