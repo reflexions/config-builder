@@ -12,43 +12,34 @@ const imageLoaderConfig = async ({ config, isProduction, isNode }) => {
 			...config.module,
 
 			rules: [
-				...config.module?.rules ?? [],
+				...(config.module?.rules ?? []),
 
 				{
 					dependency: {
-						not: [
-							"url",
-						],
+						not: ["url"],
 					},
-					test: [
-						/\.bmp$/,
-						/\.gif$/,
-						/\.jpe?g$/,
-						/\.png$/,
-						/\.svg$/,
-					],
+					test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.svg$/],
 					...(useAssetModules
 						? {
-							type: 'asset/resource',
-						} : {
-							use: [
-								{
-									ident: "image-loader",
-									loader: "url-loader",
-									options: {
-										//emitFile: !isNode,
-										emitFile: true,
-										limit: 10000,
-										name: "static/media/[name].[contenthash:8].[ext]",
+								type: "asset/resource",
+							}
+						: {
+								use: [
+									{
+										ident: "image-loader",
+										loader: "url-loader",
+										options: {
+											//emitFile: !isNode,
+											emitFile: true,
+											limit: 10000,
+											name: "static/media/[name].[contenthash:8].[ext]",
+										},
 									},
-								},
-							],
+								],
 
-							// stop Asset Modules from processing your assets again as that would result in asset duplication
-							type: 'javascript/auto',
-						}
-					),
-
+								// stop Asset Modules from processing your assets again as that would result in asset duplication
+								type: "javascript/auto",
+							}),
 				},
 			],
 		},
@@ -56,7 +47,7 @@ const imageLoaderConfig = async ({ config, isProduction, isNode }) => {
 };
 
 const attachImageLoaderConfigCrumb = Symbol("attachImageLoaderConfigCrumb");
-const attachImageLoaderConfig = async config => {
+const attachImageLoaderConfig = async (config) => {
 	const isProduction = getIsProduction();
 	const isNode = getIsNode();
 	return await imageLoaderConfig({ config, isProduction, isNode });

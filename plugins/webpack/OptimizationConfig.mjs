@@ -1,24 +1,19 @@
-import TerserPlugin from 'terser-webpack-plugin';
-import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
+import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
+import TerserPlugin from "terser-webpack-plugin";
+import { getHook, getHookFnResult } from "../../RunPlugins.mjs";
 import {
 	getIsProduction,
 	getMinimize,
-	getMinimizeNode,
 	getMinimizeBrowser,
+	getMinimizeNode,
 } from "../context-providers/options/Options.mjs";
-
-import {
-	getIsBrowser,
-	getIsNode,
-} from "./SeparateNodeAndBrowserBuilds.mjs";
-import {
-	getHook,
-	getHookFnResult,
-} from "../../RunPlugins.mjs";
+import { getIsBrowser, getIsNode } from "./SeparateNodeAndBrowserBuilds.mjs";
 
 export const cssMinifierEnabledHook = Symbol("cssMinifierEnabledHook");
 export const cssMinifierNameHook = Symbol("cssMinifierNameHook");
-export const cssMinifierPluginInstanceHook = Symbol("cssMinifierPluginInstanceHook");
+export const cssMinifierPluginInstanceHook = Symbol(
+	"cssMinifierPluginInstanceHook",
+);
 
 const terserPluginOptions = {
 	// https://webpack.js.org/plugins/terser-webpack-plugin/#options
@@ -61,71 +56,72 @@ const terserPluginOptions = {
 			ascii_only: true,
 		},
 	},
-}
+};
 
 const optimizationConfig = async ({ config, isProduction, isNode }) => {
-
 	// options from https://webpack.js.org/plugins/css-minimizer-webpack-plugin/#minify
 	// webpack's default is cssnanoMinify
 	// cleancss leaves in duplicate root var declarations and is ~2x bigger than the others
 	// esbuildMinify saves 3 sec but makes a slightly larger file than cssnano
 	const cssMinifierName = getHook(cssMinifierNameHook, "cssnanoMinify");
 
-	const cssMinifierPluginInstance = getHookFnResult(cssMinifierPluginInstanceHook, () => (
-		// in addition to minifying, this merges all css into a single file
-		new CssMinimizerPlugin({
-			minimizerOptions: ['cssnanoMinify'].includes(cssMinifierName)
-				? {
-					sourceMap: true,
-				}
-				: undefined,
+	const cssMinifierPluginInstance = getHookFnResult(
+		cssMinifierPluginInstanceHook,
+		() =>
+			// in addition to minifying, this merges all css into a single file
+			new CssMinimizerPlugin({
+				minimizerOptions: ["cssnanoMinify"].includes(cssMinifierName)
+					? {
+							sourceMap: true,
+						}
+					: undefined,
 
-			// Default: CssMinimizerPlugin.cssnanoMinify
-			//minify: CssMinimizerPlugin.cleanCssMinify,
-			minify: CssMinimizerPlugin[ cssMinifierName ],
+				// Default: CssMinimizerPlugin.cssnanoMinify
+				//minify: CssMinimizerPlugin.cleanCssMinify,
+				minify: CssMinimizerPlugin[cssMinifierName],
 
-			// to do it all manually (if you want to see the output before minification)
-			// minify: async (data, inputMap, minimizerOptions) => {
-			// 	// this import doesn't work if done earlier
-			//  // Webpack docs note: "Always use require inside minify function when parallel option enabled."
-			// 	const CleanCss = (await import('clean-css')).default;
-			//
-			// 	const [[filename, input]] = Object.entries(data);
-			//
-			// 	const minifiedCss = await new CleanCss({
-			// 		sourceMap: minimizerOptions.sourceMap,
-			// 		returnPromise: true,
-			// 	})
-			// 		.minify({
-			// 			[filename]: {
-			// 				styles: input,
-			// 				sourceMap: inputMap,
-			// 			},
-			// 		})
-			// 		.catch((error) => {
-			// 			console.error("CleanCss failed", error);
-			// 			throw error;
-			// 		});
-			//
-			// 	return {
-			// 		css: minifiedCss.styles,
-			// 		map: minifiedCss.sourceMap ? minifiedCss.sourceMap.toJSON() : '',
-			// 		warnings: minifiedCss.warnings,
-			// 	};
-			// },
-		})
-	));
-	return ({
+				// to do it all manually (if you want to see the output before minification)
+				// minify: async (data, inputMap, minimizerOptions) => {
+				// 	// this import doesn't work if done earlier
+				//  // Webpack docs note: "Always use require inside minify function when parallel option enabled."
+				// 	const CleanCss = (await import('clean-css')).default;
+				//
+				// 	const [[filename, input]] = Object.entries(data);
+				//
+				// 	const minifiedCss = await new CleanCss({
+				// 		sourceMap: minimizerOptions.sourceMap,
+				// 		returnPromise: true,
+				// 	})
+				// 		.minify({
+				// 			[filename]: {
+				// 				styles: input,
+				// 				sourceMap: inputMap,
+				// 			},
+				// 		})
+				// 		.catch((error) => {
+				// 			console.error("CleanCss failed", error);
+				// 			throw error;
+				// 		});
+				//
+				// 	return {
+				// 		css: minifiedCss.styles,
+				// 		map: minifiedCss.sourceMap ? minifiedCss.sourceMap.toJSON() : '',
+				// 		warnings: minifiedCss.warnings,
+				// 	};
+				// },
+			}),
+	);
+	return {
 		...config,
 
 		optimization: {
-			minimize: getHookFnResult(cssMinifierEnabledHook, () => (
+			minimize: getHookFnResult(cssMinifierEnabledHook, () =>
 				getIsBrowser()
 					? getMinimizeBrowser()
 					: getIsNode()
 						? getMinimizeNode()
-						: getMinimize()
-			)),
+						: getMinimize(),
+			),
 			providedExports: isProduction,
 			removeAvailableModules: isProduction,
 			removeEmptyChunks: isProduction,
@@ -137,11 +133,11 @@ const optimizationConfig = async ({ config, isProduction, isNode }) => {
 				cssMinifierPluginInstance,
 			],
 		},
-	});
+	};
 };
 
 const optimizationConfigCrumb = Symbol("optimizationConfigCrumb");
-const attachOptimizationConfig = async config => {
+const attachOptimizationConfig = async (config) => {
 	const isProduction = getIsProduction();
 	const isNode = getIsNode();
 	return await optimizationConfig({ config, isProduction, isNode });

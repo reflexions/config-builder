@@ -34,15 +34,14 @@ if (hotness) {
 	ErrorOverlay.setEditorHandler(function editorHandler(errorLocation) {
 		// Keep this sync with errorOverlayMiddleware.js
 		parsedSocketUrl.pathname = launchEditorEndpoint;
-		parsedSocketUrl.search = '?fileName=' +
+		parsedSocketUrl.search =
+			"?fileName=" +
 			window.encodeURIComponent(errorLocation.fileName) +
-			'&lineNumber=' +
+			"&lineNumber=" +
 			window.encodeURIComponent(errorLocation.lineNumber || 1) +
-			'&colNumber=' +
+			"&colNumber=" +
 			window.encodeURIComponent(errorLocation.colNumber || 1);
-		fetch(parsedSocketUrl.href,
-			{ mode: 'no-cors' },
-		);
+		fetch(parsedSocketUrl.href, { mode: "no-cors" });
 	});
 
 	// We need to keep track of if there has been a runtime error.
@@ -53,13 +52,13 @@ if (hotness) {
 	// See https://github.com/facebookincubator/create-react-app/issues/3096
 	let hadRuntimeError = false;
 	ErrorOverlay.startReportingRuntimeErrors({
-		onError: function () {
+		onError: () => {
 			hadRuntimeError = true;
 		},
-		filename: process.env.REACT_BUNDLE_PATH || '/static/js/bundle.js',
+		filename: process.env.REACT_BUNDLE_PATH || "/static/js/bundle.js",
 	});
 
-	hotness.dispose(function (data) {
+	hotness.dispose((data) => {
 		// TODO: why do we need this?
 		ErrorOverlay.stopReportingRuntimeErrors();
 	});
@@ -72,10 +71,10 @@ if (hotness) {
 	// Unlike WebpackDevServer client, we won't try to reconnect
 	// to avoid spamming the console. Disconnect usually happens
 	// when developer stops the server.
-	connection.onclose = function () {
-		if (typeof console !== 'undefined' && typeof console.info === 'function') {
+	connection.onclose = () => {
+		if (typeof console !== "undefined" && typeof console.info === "function") {
 			console.info(
-				'The development server has disconnected.\nRefresh the page if necessary.',
+				"The development server has disconnected.\nRefresh the page if necessary.",
 			);
 		}
 	};
@@ -87,7 +86,7 @@ if (hotness) {
 
 	function clearOutdatedErrors() {
 		// Clean up outdated compile errors, if any.
-		if (typeof console !== 'undefined' && typeof console.clear === 'function') {
+		if (typeof console !== "undefined" && typeof console.clear === "function") {
 			if (hasCompileErrors) {
 				console.clear();
 			}
@@ -127,16 +126,19 @@ if (hotness) {
 				errors: [],
 			});
 
-			if (typeof console !== 'undefined' && typeof console.warn === 'function') {
+			if (
+				typeof console !== "undefined" &&
+				typeof console.warn === "function"
+			) {
 				for (let i = 0; i < formatted.warnings.length; i++) {
 					if (i === 5) {
 						console.warn(
-							'There were more warnings in other files.\n' +
-							'You can find a complete log in the terminal.',
+							"There were more warnings in other files.\n" +
+								"You can find a complete log in the terminal.",
 						);
 						break;
 					}
-					console.warn(stripAnsi(formatted.warnings[ i ]));
+					console.warn(stripAnsi(formatted.warnings[i]));
 				}
 			}
 		}
@@ -151,8 +153,7 @@ if (hotness) {
 				// Otherwise it would flicker right before the reload.
 				tryDismissErrorOverlay();
 			});
-		}
-		else {
+		} else {
 			// Print initial warnings immediately.
 			printWarnings();
 		}
@@ -172,12 +173,12 @@ if (hotness) {
 		});
 
 		// Only show the first error.
-		ErrorOverlay.reportBuildError(formatted.errors[ 0 ]);
+		ErrorOverlay.reportBuildError(formatted.errors[0]);
 
 		// Also log them to the console.
-		if (typeof console !== 'undefined' && typeof console.error === 'function') {
+		if (typeof console !== "undefined" && typeof console.error === "function") {
 			for (const i = 0; i < formatted.errors.length; i++) {
-				console.error(stripAnsi(formatted.errors[ i ]));
+				console.error(stripAnsi(formatted.errors[i]));
 			}
 		}
 
@@ -198,24 +199,24 @@ if (hotness) {
 	}
 
 	// Handle messages from the server.
-	connection.onmessage = function (e) {
+	connection.onmessage = (e) => {
 		const message = JSON.parse(e.data);
 		switch (message.type) {
-			case 'hash':
+			case "hash":
 				handleAvailableHash(message.data);
 				break;
-			case 'still-ok':
-			case 'ok':
+			case "still-ok":
+			case "ok":
 				handleSuccess();
 				break;
-			case 'content-changed':
+			case "content-changed":
 				// Triggered when a file from `contentBase` changed.
 				window.location.reload();
 				break;
-			case 'warnings':
+			case "warnings":
 				handleWarnings(message.data);
 				break;
-			case 'errors':
+			case "errors":
 				handleErrors(message.data);
 				break;
 			default:
@@ -233,13 +234,15 @@ if (hotness) {
 
 	// Webpack disallows updates in other states.
 	function canApplyUpdates() {
-		return hotness.status() === 'idle';
+		return hotness.status() === "idle";
 	}
 
 	// Attempt to update code on the fly, fall back to a hard reload.
 	function tryApplyUpdates(onHotUpdateSuccess) {
 		if (!hotness) {
-			console.log("HotModuleReplacementPlugin is not in Webpack configuration.");
+			console.log(
+				"HotModuleReplacementPlugin is not in Webpack configuration.",
+			);
 			window.location.reload();
 			return;
 		}
@@ -258,7 +261,7 @@ if (hotness) {
 				return;
 			}
 
-			if (typeof onHotUpdateSuccess === 'function') {
+			if (typeof onHotUpdateSuccess === "function") {
 				// Maybe we want to do something.
 				onHotUpdateSuccess();
 			}
@@ -275,16 +278,15 @@ if (hotness) {
 		// // Webpack 2 returns a Promise instead of invoking a callback
 		if (result && result.then) {
 			result.then(
-				function (updatedModules) {
+				(updatedModules) => {
 					handleApplyUpdates(null, updatedModules);
 				},
-				function (err) {
+				(err) => {
 					handleApplyUpdates(err, null);
 				},
 			);
 		}
 	}
-}
-else {
+} else {
 	console.log("hotness not defined");
 }

@@ -12,12 +12,9 @@ export default {
 		},
 		hooks: {
 			elements: {
-				type: "Map"
+				type: "Map",
 			},
 		},
 	},
-	required: [
-		"name",
-		"crumb"
-	],
+	required: ["name", "crumb"],
 };

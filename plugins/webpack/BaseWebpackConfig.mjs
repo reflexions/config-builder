@@ -1,16 +1,11 @@
-import ESLintPlugin from 'eslint-webpack-plugin';
+import ESLintPlugin from "eslint-webpack-plugin";
+import { getHook, getHookFnResult } from "../../RunPlugins.mjs";
 import {
 	getHmrClientPublicUrl,
 	getIsProduction,
 	getPublicUrl,
 } from "../context-providers/options/Options.mjs";
-import {
-	getIsNode,
-} from "./SeparateNodeAndBrowserBuilds.mjs";
-import {
-	getHook,
-	getHookFnResult,
-} from "../../RunPlugins.mjs";
+import { getIsNode } from "./SeparateNodeAndBrowserBuilds.mjs";
 
 const profile = false; // https://webpack.js.org/configuration/other-options/#profile
 const parallelism = undefined; // https://webpack.js.org/configuration/other-options/#parallelism
@@ -33,12 +28,12 @@ export const fallback = Symbol("fallback");
 export const resolveSpread = Symbol("resolveSpread");
 export const baseConfigSpread = Symbol("baseConfigSpread");
 
-const buildRoot = (process.env.FRONTEND_BUILD_ROOT || '/var/www/html');
+const buildRoot = process.env.FRONTEND_BUILD_ROOT || "/var/www/html";
 
 const baseConfig = async ({ isProduction, isNode }) => ({
-	mode: await getHookFnResult(getModeHook, () => isProduction
-		? "production"
-		: "development"),
+	mode: await getHookFnResult(getModeHook, () =>
+		isProduction ? "production" : "development",
+	),
 	context: await getHookFnResult(getContextHook, () => "/var/www/html"),
 
 	// we need sourcemaps to work in 3 different contexts:
@@ -46,15 +41,15 @@ const baseConfig = async ({ isProduction, isNode }) => ({
 	// - server in container. E.g. error traces
 	// - server from host. E.g. dev tools connected to port 9229. Paths are filesystem, but filesystems with different mountpoints
 	//     chrome has workspaces, but they don't let you manually specify a mapping and don't work
-	devtool: await getHookFnResult(getDevToolHook, () => isProduction
-		? "source-map"
-		: "eval-cheap-module-source-map"),
+	devtool: await getHookFnResult(getDevToolHook, () =>
+		isProduction ? "source-map" : "eval-cheap-module-source-map",
+	),
 	output: {
 		pathinfo: !isProduction,
-		hashFunction: getHook(hashFunction, 'xxhash64'),
-		crossOriginLoading: await getHookFnResult(getCrossOriginLoadingHook, () => isProduction
-			? undefined
-			: "anonymous"),
+		hashFunction: getHook(hashFunction, "xxhash64"),
+		crossOriginLoading: await getHookFnResult(getCrossOriginLoadingHook, () =>
+			isProduction ? undefined : "anonymous",
+		),
 	},
 	profile,
 	parallelism,
@@ -66,18 +61,20 @@ const baseConfig = async ({ isProduction, isNode }) => ({
 
 	plugins: [
 		...(getHook(useEslint, true)
-				? [
-					getHook(eslintPlugin, new ESLintPlugin(
-						getHook(eslintPluginOptions, {
-							lintDirtyModulesOnly: true,
-							configType: "flat", // https://webpack.js.org/plugins/eslint-webpack-plugin/#configtype
-							eslintPath: "eslint/use-at-your-own-risk", // required by configType: flat
-							failOnError: isProduction,
-						})
-					))
+			? [
+					getHook(
+						eslintPlugin,
+						new ESLintPlugin(
+							getHook(eslintPluginOptions, {
+								lintDirtyModulesOnly: true,
+								configType: "flat", // https://webpack.js.org/plugins/eslint-webpack-plugin/#configtype
+								eslintPath: "eslint/use-at-your-own-risk", // required by configType: flat
+								failOnError: isProduction,
+							}),
+						),
+					),
 				]
-				: []
-		),
+			: []),
 	],
 
 	resolve: {
@@ -90,16 +87,7 @@ const baseConfig = async ({ isProduction, isNode }) => ({
 			// ".ts",
 			// ".tsx",
 		]),
-		mainFields: isNode
-			? [
-				"main",
-				"module",
-			]
-			: [
-				"browser",
-				"module",
-				"main",
-			],
+		mainFields: isNode ? ["main", "module"] : ["browser", "module", "main"],
 		modules: getHook(modules, [
 			buildRoot + "/src",
 			// "/var/www/html/src/styles", // not needed now that we have postcssGlobalData importing this stuff automatically
@@ -108,20 +96,20 @@ const baseConfig = async ({ isProduction, isNode }) => ({
 		plugins: getHook(plugins, []),
 		unsafeCache: false,
 
-		fallback: getHook(fallback, isNode
-			? {}
-			: {
-				crypto: buildRoot + "/node_modules/crypto-js/index.js",
-				stream: buildRoot + "/node_modules/stream-browserify/index.js",
-			}
+		fallback: getHook(
+			fallback,
+			isNode
+				? {}
+				: {
+						crypto: buildRoot + "/node_modules/crypto-js/index.js",
+						stream: buildRoot + "/node_modules/stream-browserify/index.js",
+					},
 		),
 
 		...getHook(resolveSpread, {}),
 	},
 	resolveLoader: {
-		modules: [
-			buildRoot + "/node_modules",
-		],
+		modules: [buildRoot + "/node_modules"],
 		plugins: [],
 	},
 
@@ -129,14 +117,14 @@ const baseConfig = async ({ isProduction, isNode }) => ({
 });
 
 const attachBaseWebpackConfigCrumb = Symbol("attachBaseWebpackConfig");
-const attachBaseWebpackConfig = async config => {
+const attachBaseWebpackConfig = async (config) => {
 	const isProduction = getIsProduction();
 	const isNode = getIsNode();
 
-	return ({
+	return {
 		...config,
-		...await baseConfig({ isProduction, isNode }),
-	});
+		...(await baseConfig({ isProduction, isNode })),
+	};
 };
 
 export default {

@@ -1,6 +1,6 @@
-import { fileURLToPath } from 'node:url';
-
 import path, { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+import { getHook } from "../../../RunPlugins.mjs";
 import {
 	appAssetsManifestSymbol,
 	appBabelRcSymbol,
@@ -15,7 +15,6 @@ import {
 	dotEnvSymbol,
 } from "./Paths.mjs";
 import pathsContext from "./PathsContext.mjs";
-import { getHook } from "../../../RunPlugins.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -26,21 +25,27 @@ const pathsFromEnvPlugin = async (passthrough) => {
 	const paths = pathsContext.getStore();
 
 	const appDirBuilder = getHook(appDirBuilderSyncHook, (relativePath) =>
-		path.resolve((process.env.FRONTEND_BUILD_ROOT || '/var/www/html'), relativePath)
+		path.resolve(
+			process.env.FRONTEND_BUILD_ROOT || "/var/www/html",
+			relativePath,
+		),
 	);
 
-	paths.set(dotEnvSymbol, appDirBuilder('.env'));
-	paths.set(appDirSymbol, appDirBuilder('.'));
-	paths.set(appBuildDirSymbol, appDirBuilder('build'));
-	paths.set(appBuildPublicDirSymbol, appDirBuilder('build/public'));
-	paths.set(appAssetsManifestSymbol, appDirBuilder('build/assets-manifest.json'));
-	paths.set(appSrcPublicDirSymbol, appDirBuilder('public'));
-	paths.set(appNodeModulesSymbol, appDirBuilder('node_modules'));
-	paths.set(appSrcSymbol, appDirBuilder('src'));
-	paths.set(appPackageJsonSymbol, appDirBuilder('package.json'));
-	paths.set(appBabelRcSymbol, appDirBuilder('babel.config.json'));
+	paths.set(dotEnvSymbol, appDirBuilder(".env"));
+	paths.set(appDirSymbol, appDirBuilder("."));
+	paths.set(appBuildDirSymbol, appDirBuilder("build"));
+	paths.set(appBuildPublicDirSymbol, appDirBuilder("build/public"));
+	paths.set(
+		appAssetsManifestSymbol,
+		appDirBuilder("build/assets-manifest.json"),
+	);
+	paths.set(appSrcPublicDirSymbol, appDirBuilder("public"));
+	paths.set(appNodeModulesSymbol, appDirBuilder("node_modules"));
+	paths.set(appSrcSymbol, appDirBuilder("src"));
+	paths.set(appPackageJsonSymbol, appDirBuilder("package.json"));
+	paths.set(appBabelRcSymbol, appDirBuilder("babel.config.json"));
 
-	paths.set(configBuilderDirSymbol, path.resolve(__dirname, '../../..'));
+	paths.set(configBuilderDirSymbol, path.resolve(__dirname, "../../.."));
 
 	console.log("paths", paths);
 

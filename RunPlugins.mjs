@@ -1,12 +1,11 @@
-import { breadcrumbContext } from "./BreadcrumbContext.mjs";
 import { validate } from "schema-utils";
-import pluginSchema from "./PluginSchema.mjs";
 import availableHooksContext from "./AvailableHooksContext.mjs";
-
+import { breadcrumbContext } from "./BreadcrumbContext.mjs";
+import pluginSchema from "./PluginSchema.mjs";
 
 export const getHook = (hookSymbol, defaultValue = undefined) => {
 	// the first element is the latest version of the hook that overrode the others in the array
-	return availableHooksContext.getStore().get(hookSymbol)?.[ 0 ] ?? defaultValue;
+	return availableHooksContext.getStore().get(hookSymbol)?.[0] ?? defaultValue;
 };
 
 /**
@@ -21,29 +20,30 @@ export const getHook = (hookSymbol, defaultValue = undefined) => {
  * @param args
  * @returns {*}
  */
-export const getHookFnResult = (hookSymbol, defaultImplementation = undefined, args = []) => {
+export const getHookFnResult = (
+	hookSymbol,
+	defaultImplementation = undefined,
+	args = [],
+) => {
 	const oldStore = availableHooksContext.getStore();
 	const existingHookList = oldStore.get(hookSymbol);
 
 	// create a new hook list for this call that includes the defaultImplementation
-	const newHookList = [
-		...existingHookList ?? [],
-		defaultImplementation,
-	];
+	const newHookList = [...(existingHookList ?? []), defaultImplementation];
 	const newStore = new Map(oldStore);
 	newStore.set(hookSymbol, newHookList);
 
-	const value = newHookList[ 0 ];
+	const value = newHookList[0];
 
-	return availableHooksContext.run(newStore, () =>
-		value(...args)
-	);
-}
+	return availableHooksContext.run(newStore, () => value(...args));
+};
 
-const runPlugins = async plugins => {
+const runPlugins = async (plugins) => {
 	const hooks = availableHooksContext.getStore() ?? new Map();
 	const breadcrumb = breadcrumbContext.getStore();
-	const breadcrumbStr = breadcrumb.map(symbol => symbol.description).join("/");
+	const breadcrumbStr = breadcrumb
+		.map((symbol) => symbol.description)
+		.join("/");
 
 	for (const plugin of plugins) {
 		// validate the shape of the plugin object
@@ -51,11 +51,12 @@ const runPlugins = async plugins => {
 
 		// register the plugin's hooks
 		// keep a list of previous registrations of the same hook so that the one that gets called can call the others if it chooses
-		plugin.hooks?.forEach(
-			(callback, key) => hooks.set(key,
+		plugin.hooks?.forEach((callback, key) =>
+			hooks.set(
+				key,
 				// unshifts callback, returning the new array
-				[ callback, ...(hooks.get(key) || []) ]
-			)
+				[callback, ...(hooks.get(key) || [])],
+			),
 		);
 	}
 
@@ -66,11 +67,11 @@ const runPlugins = async plugins => {
 		for (const plugin of plugins) {
 			if (plugin.main) {
 				console.info(`${breadcrumbStr} calling plugin ${plugin.name}`);
-				config = await breadcrumbContext.run([ ...breadcrumb, plugin.crumb ], async () =>
-					await plugin.main(config)
+				config = await breadcrumbContext.run(
+					[...breadcrumb, plugin.crumb],
+					async () => await plugin.main(config),
 				);
-			}
-			else {
+			} else {
 				// this plugin only registers hooks
 			}
 		}

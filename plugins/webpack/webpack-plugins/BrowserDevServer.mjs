@@ -34,19 +34,15 @@ export default class BrowserDevServerPlugin {
 				// there are two parallel compilations using BrowserDevServerPlugin?
 				// without this, we get "Error: listen EADDRINUSE: address already in use 0.0.0.0:81"
 				return;
-			}
-			else {
+			} else {
 				once = true;
 			}
 
 			const waitForCleanup = new Promise((resolve, reject) => {
 				if (this.clientDevServer) {
 					console.log("stopping clientDevServer");
-					this.clientDevServer.stop()
-						.then(resolve)
-						.catch(reject);
-				}
-				else {
+					this.clientDevServer.stop().then(resolve).catch(reject);
+				} else {
 					resolve();
 				}
 			});
@@ -55,10 +51,10 @@ export default class BrowserDevServerPlugin {
 				const options = browserDevServerConfig();
 
 				// WebpackDevServer API docs: https://webpack.js.org/api/webpack-dev-server/
-				const clientDevServer = this.clientDevServer = new WebpackDevServer(
+				const clientDevServer = (this.clientDevServer = new WebpackDevServer(
 					options,
 					compiler,
-				);
+				));
 
 				try {
 					await clientDevServer.start();
@@ -72,8 +68,7 @@ export default class BrowserDevServerPlugin {
 						console.log("HMR startup workaround complete");
 					});
 					console.log("clientDevServer started");
-				}
-				catch (error) {
+				} catch (error) {
 					console.log("clientDevServer.startCallback error");
 					errorLog(error);
 				}

@@ -1,8 +1,8 @@
+import { getHookFnResult } from "../../RunPlugins.mjs";
 import {
 	getHmrClientPublicUrl,
 	getIsProduction,
 } from "../context-providers/options/Options.mjs";
-import { getHookFnResult } from "../../RunPlugins.mjs";
 import WaitForAssetsPlugin from "./webpack-plugins/WaitForAssetsPlugin.mjs";
 
 /* https://webpack.js.org/configuration/target/#target */
@@ -10,22 +10,30 @@ export const getNodeTargetHook = Symbol("getNodeTargetHook");
 /* https://babeljs.io/docs/options#targets */
 export const getNodeTargetsHook = Symbol("getNodeTargetsHook");
 export const getNodeOutputFilenameHook = Symbol("getNodeOutputFilenameHook");
-export const getNodeOutputChunkFilenameHook = Symbol("getNodeOutputChunkFilenameHook");
+export const getNodeOutputChunkFilenameHook = Symbol(
+	"getNodeOutputChunkFilenameHook",
+);
 export const getNodeLibraryTargetHook = Symbol("getNodeLibraryTargetHook");
 export const getNodePluginsHook = Symbol("getNodePluginsHook");
 export const getNodeExternalsHook = Symbol("getNodeExternalsHook");
 
 const nodeVersion = process.versions.node;
-const nodeVersionSplit = nodeVersion.split('.');
+const nodeVersionSplit = nodeVersion.split(".");
 // https://webpack.js.org/configuration/target/
 // with 'es2021', imports like 'fs' don't exit
-const defaultWebpackNodeTarget = 'async-node' + nodeVersionSplit[ 0 ] + '.' + nodeVersionSplit[ 1 ];
+const defaultWebpackNodeTarget =
+	"async-node" + nodeVersionSplit[0] + "." + nodeVersionSplit[1];
 
 const highestVersionSupportedByBrowserslist = (majorVersion, minorVersion) => {
-	return nodeVersionSplit[ 0 ] + '.' + nodeVersionSplit[ 1 ];
+	return nodeVersionSplit[0] + "." + nodeVersionSplit[1];
 };
 
-export const defaultBrowserslistNodeTarget = 'node ' + highestVersionSupportedByBrowserslist(nodeVersionSplit[ 0 ], nodeVersionSplit[ 1 ]);
+export const defaultBrowserslistNodeTarget =
+	"node " +
+	highestVersionSupportedByBrowserslist(
+		nodeVersionSplit[0],
+		nodeVersionSplit[1],
+	);
 
 // Module HMR not supported yet https://github.com/webpack/webpack/issues/17636#issuecomment-1862935581
 const outputModules = false;
@@ -33,36 +41,39 @@ const outputModules = false;
 const nodeConfig = async ({ config, isProduction }) => ({
 	...config,
 
-	target: await getHookFnResult(getNodeTargetHook, () => defaultWebpackNodeTarget),
+	target: await getHookFnResult(
+		getNodeTargetHook,
+		() => defaultWebpackNodeTarget,
+	),
 	entry: {
-		"server": [
+		server: [
 			//"/var/www/html/node_modules/razzle-dev-utils/prettyNodeErrors.js",
-			isProduction
-				? null
-				: "webpack/hot/dev-server", // razzle used webpack/hot/poll.js?300 instead
+			isProduction ? null : "webpack/hot/dev-server", // razzle used webpack/hot/poll.js?300 instead
 			"/var/www/html/src/index.js",
-		].filter(x => x),
+		].filter((x) => x),
 	},
 	output: {
 		...config.output,
 
 		path: "/var/www/html/build",
 		//publicPath: '/',
-		publicPath: isProduction
-			? '/'
-			: getHmrClientPublicUrl().href,
+		publicPath: isProduction ? "/" : getHmrClientPublicUrl().href,
 
-		filename: await getHookFnResult(getNodeOutputFilenameHook, () => `[name].${isProduction
-			? '[contenthash:8].'
-			: ''}js`),
-		chunkFilename: await getHookFnResult(getNodeOutputChunkFilenameHook, () => `[name].${isProduction
-			? '[contenthash:8].'
-			: ''}chunk.js`),
+		filename: await getHookFnResult(
+			getNodeOutputFilenameHook,
+			() => `[name].${isProduction ? "[contenthash:8]." : ""}js`,
+		),
+		chunkFilename: await getHookFnResult(
+			getNodeOutputChunkFilenameHook,
+			() => `[name].${isProduction ? "[contenthash:8]." : ""}chunk.js`,
+		),
 
 		/* deprecated https://webpack.js.org/configuration/output/#outputlibrarytarget */
 		//libraryTarget: await getHookFnResult(getNodeLibraryTargetHook, () => "commonjs2"),
 		library: {
-			type: await getHookFnResult(getNodeLibraryTargetHook, () => outputModules ? "module" : "commonjs2"),
+			type: await getHookFnResult(getNodeLibraryTargetHook, () =>
+				outputModules ? "module" : "commonjs2",
+			),
 			name: "server",
 		},
 
@@ -102,21 +113,21 @@ const nodeConfig = async ({ config, isProduction }) => ({
 
 	externals: await getHookFnResult(getNodeExternalsHook, () => ({
 		appdynamics: "appdynamics",
-		'@newrelic/native-metrics': '@newrelic/native-metrics',
-		'newrelic': 'newrelic',
+		"@newrelic/native-metrics": "@newrelic/native-metrics",
+		newrelic: "newrelic",
 	})),
 
 	plugins: [
-		...config.plugins ?? [],
+		...(config.plugins ?? []),
 
-		...await getHookFnResult(getNodePluginsHook, () => ([])),
+		...(await getHookFnResult(getNodePluginsHook, () => [])),
 
 		new WaitForAssetsPlugin(),
 	],
 });
 
 const attachNodeConfigCrumb = Symbol("attachNodeConfigCrumb");
-const attachNodeConfig = async config => {
+const attachNodeConfig = async (config) => {
 	const isProduction = getIsProduction();
 	return await nodeConfig({ config, isProduction });
 };

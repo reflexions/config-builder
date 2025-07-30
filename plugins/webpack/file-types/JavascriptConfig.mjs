@@ -1,16 +1,12 @@
+import { getHookFnResult } from "../../../RunPlugins.mjs";
 import {
 	getEmotionSsr,
 	getIsProduction,
 	getOldBrowserCompatibility,
 	getShouldUseReactRefresh,
 } from "../../context-providers/options/Options.mjs";
-import { getHookFnResult } from "../../../RunPlugins.mjs";
+import { getTargetsHook } from "../../hooks/GetTargets.mjs";
 import { getIsNode } from "../SeparateNodeAndBrowserBuilds.mjs";
-import {
-	getTargetsHook,
-} from "../../hooks/GetTargets.mjs";
-
-
 
 export const presetEnvOptions = async (target, old_browser_compat) => {
 	// https://babeljs.io/docs/en/babel-preset-env#options
@@ -49,9 +45,9 @@ export const presetEnvOptions = async (target, old_browser_compat) => {
 	options.debug = true;
 
 	// same list in postcss-options.js
-	options.targets = await getHookFnResult(getTargetsHook, undefined, [ isNode ]);
+	options.targets = await getHookFnResult(getTargetsHook, undefined, [isNode]);
 
-	if (target === 'node' || !old_browser_compat) {
+	if (target === "node" || !old_browser_compat) {
 		// https://babeljs.io/docs/en/babel-preset-env#targetsesmodules
 		options.targets.esmodules = true;
 	}
@@ -67,9 +63,7 @@ export const presetEnvOptions = async (target, old_browser_compat) => {
 	// https://reflexions.slack.com/archives/C8KP2CGTZ/p1648491524080239?thread_ts=1648488747.832409&cid=C8KP2CGTZ
 	// if we do need these corejs polyfills, let's add them ourselves in client.js
 	// preset-env is still useful for non-polyfill stuff like rewriting syntax
-	options.useBuiltIns = old_browser_compat && false
-		? 'usage'
-		: false;
+	options.useBuiltIns = old_browser_compat && false ? "usage" : false;
 
 	// https://babeljs.io/docs/en/babel-preset-env#corejs
 	if (options.useBuiltIns) {
@@ -83,11 +77,11 @@ export const presetEnvOptions = async (target, old_browser_compat) => {
 };
 
 export const presetEnvPreset = async (target, old_browser_compat) => [
-	'@babel/preset-env',
+	"@babel/preset-env",
 	await presetEnvOptions(target, old_browser_compat),
 ];
 
-export const transformRuntimeOptions = ({
+export const transformRuntimeOptions = {
 	// https://babeljs.io/docs/en/babel-plugin-transform-runtime#options
 	// it wouldn't add corejs polyfills automatically without this
 	corejs: {
@@ -96,7 +90,7 @@ export const transformRuntimeOptions = ({
 	},
 	absoluteRuntime: true,
 	version: "^7.20.7", // should match the @babel/runtime-corejs3 version in package.json
-});
+};
 
 // disabling this because it's causing a "ReferenceError: require is not defined" client-side runtime error in prod builds
 // https://reflexions.slack.com/archives/C8KP2CGTZ/p1648491524080239?thread_ts=1648488747.832409&cid=C8KP2CGTZ
@@ -107,21 +101,25 @@ export const transformRuntimePlugin = [
 
 const javascriptConfig = async ({ config, isProduction, isNode }) => {
 	const old_browser_compat = !isNode && getOldBrowserCompatibility();
-	console.log("old_browser_compat", old_browser_compat, isNode, typeof process.env.OLD_BROWSER_COMPAT, isProduction);
+	console.log(
+		"old_browser_compat",
+		old_browser_compat,
+		isNode,
+		typeof process.env.OLD_BROWSER_COMPAT,
+		isProduction,
+	);
 	const EMOTION_SSR = getEmotionSsr();
-	return ({
+	return {
 		...config,
 
 		module: {
 			...config.module,
 
 			rules: [
-				...config.module?.rules ?? [],
+				...(config.module?.rules ?? []),
 
 				{
-					exclude: [
-						/node_modules/,
-					],
+					exclude: [/node_modules/],
 					test: /\.(js|jsx|mjs|ts|tsx)$/,
 					use: [
 						{
@@ -135,7 +133,7 @@ const javascriptConfig = async ({ config, isProduction, isNode }) => {
 									EMOTION_SSR && [
 										// https://emotion.sh/docs/install#babelrc
 										"@emotion",
-										{ "sourceMap": true },
+										{ sourceMap: true },
 									],
 									"@babel/plugin-proposal-class-properties",
 									[
@@ -162,8 +160,11 @@ const javascriptConfig = async ({ config, isProduction, isNode }) => {
 									"@babel/plugin-transform-react-display-name",
 									//dev && require.resolve('react-refresh/babel'),
 									//dev && require.resolve('babel-preset-razzle/babel-plugins/no-anonymous-default-export'),
-									getShouldUseReactRefresh() && !isProduction && !isNode && 'react-refresh/babel',
-								].filter(x => x),
+									getShouldUseReactRefresh() &&
+										!isProduction &&
+										!isNode &&
+										"react-refresh/babel",
+								].filter((x) => x),
 								presets: [
 									[
 										"@babel/preset-env",
@@ -171,7 +172,11 @@ const javascriptConfig = async ({ config, isProduction, isNode }) => {
 											bugfixes: true,
 											debug: true,
 											modules: false,
-											targets: await getHookFnResult(getTargetsHook, undefined, [ isNode ]),
+											targets: await getHookFnResult(
+												getTargetsHook,
+												undefined,
+												[isNode],
+											),
 											useBuiltIns: false,
 										},
 									],
@@ -179,27 +184,31 @@ const javascriptConfig = async ({ config, isProduction, isNode }) => {
 										"@babel/preset-react",
 										{
 											// https://babeljs.io/docs/en/babel-preset-react#importsource
-											importSource: Boolean(process.env.NODE_ENV === 'development' && process.env.WHY_DID_YOU_RENDER)
-												? '@welldone-software/why-did-you-render'
-												: 'react',
+											importSource:
+												process.env.NODE_ENV === "development" &&
+												process.env.WHY_DID_YOU_RENDER
+													? "@welldone-software/why-did-you-render"
+													: "react",
 											runtime: "automatic",
 										},
 									],
 								],
 								sourceMaps: true,
 								sourceType: "module",
-								targets: await getHookFnResult(getTargetsHook, undefined, [ isNode ]),
+								targets: await getHookFnResult(getTargetsHook, undefined, [
+									isNode,
+								]),
 							},
 						},
 					],
 				},
 			],
 		},
-	});
+	};
 };
 
 const attachJavascriptConfigCrumb = Symbol("attachJavascriptConfigCrumb");
-const attachJavascriptConfig = async config => {
+const attachJavascriptConfig = async (config) => {
 	const isProduction = getIsProduction();
 	const isNode = getIsNode();
 	return await javascriptConfig({ config, isProduction, isNode });

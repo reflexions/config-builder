@@ -1,15 +1,17 @@
-import stylisticJs from '@stylistic/eslint-plugin-js';
-import babel from '@babel/eslint-plugin';
-import { rules as emotionRules } from '@emotion/eslint-plugin';
-import react from 'eslint-plugin-react';
-import reactConfigsRecommended from 'eslint-plugin-react/configs/recommended.js';
-import reactConfigsJsxRuntime from 'eslint-plugin-react/configs/jsx-runtime.js';
-import { rules as importRules } from 'eslint-plugin-import';
-import cssModules, { configs as cssModulesConfigs } from 'eslint-plugin-css-modules';
-import reactHooks from 'eslint-plugin-react-hooks';
+import babelParser from "@babel/eslint-parser";
+import babel from "@babel/eslint-plugin";
+import { rules as emotionRules } from "@emotion/eslint-plugin";
 //import unusedImports from 'eslint-plugin-unused-imports';
 import js from "@eslint/js";
-import babelParser from "@babel/eslint-parser";
+import stylisticJs from "@stylistic/eslint-plugin-js";
+import cssModules, {
+	configs as cssModulesConfigs,
+} from "eslint-plugin-css-modules";
+import { rules as importRules } from "eslint-plugin-import";
+import react from "eslint-plugin-react";
+import reactConfigsJsxRuntime from "eslint-plugin-react/configs/jsx-runtime.js";
+import reactConfigsRecommended from "eslint-plugin-react/configs/recommended.js";
+import reactHooks from "eslint-plugin-react-hooks";
 import globals from "globals";
 
 export default [
@@ -64,24 +66,24 @@ export default [
 		rules: {
 			// indentation
 			// this is sometimes way off, so don't use: "CallExpression": {"arguments": "first"}
-			"@stylistic/js/indent": [ "warn", "tab", { SwitchCase: 1 } ],
+			"@stylistic/js/indent": ["warn", "tab", { SwitchCase: 1 }],
 
 			// spacing
-			"@stylistic/js/template-curly-spacing": [ "error", "never" ],
-			"@stylistic/js/array-bracket-spacing": [ 2, "always" ],
-			"@babel/object-curly-spacing": [ 2, "always" ],
-			"@stylistic/js/computed-property-spacing": [ 2, "always" ],
-			"@stylistic/js/no-multiple-empty-lines": [ "error",
+			"@stylistic/js/template-curly-spacing": ["error", "never"],
+			"@stylistic/js/array-bracket-spacing": [2, "always"],
+			"@babel/object-curly-spacing": [2, "always"],
+			"@stylistic/js/computed-property-spacing": [2, "always"],
+			"@stylistic/js/no-multiple-empty-lines": [
+				"error",
 				{ max: 10, maxEOF: 0, maxBOF: 0 },
 			],
-			"@stylistic/js/semi": [ "error" ],
+			"@stylistic/js/semi": ["error"],
 			// strings
 			//"quotes": [ 2, "double", "avoid-escape" ],
 
 			// code arrangement matter
-			"no-use-before-define": [ 2, { functions: false } ],
+			"no-use-before-define": [2, { functions: false }],
 			"no-undef": "error",
-
 
 			//"unused-imports/no-unused-imports": "error",
 
@@ -94,7 +96,7 @@ export default [
 			"no-debugger": 1,
 
 			// keep it simple
-			complexity: [ 1, 10 ],
+			complexity: [1, 10],
 
 			// for gql, import from @apollo/client instead of graphql-tag
 			//"import/no-named-as-default": "warn", // included by eslint:recommended
@@ -104,25 +106,28 @@ export default [
 			"import/no-cycle": [2, { ignoreExternal: true }],
 
 			// we'll let the optimizer remove unused vars. Too many to fix manually.
-			"no-unused-vars": [ "warn" ],
+			"no-unused-vars": ["warn"],
 
 			"no-unreachable": "warn",
 
 			// too many errors with this on:
 			"react/prop-types": "off",
 
-			"@stylistic/js/comma-dangle": [ "error", {
-				arrays: "always-multiline",
-				objects: "always-multiline",
-				imports: "always-multiline",
-				exports: "always-multiline",
-				// https://eslint.org/docs/user-guide/migrating-to-6.0.0#-the-comma-dangle-rule-is-now-more-strict-by-default
-				functions: "ignore",
-			} ],
+			"@stylistic/js/comma-dangle": [
+				"error",
+				{
+					arrays: "always-multiline",
+					objects: "always-multiline",
+					imports: "always-multiline",
+					exports: "always-multiline",
+					// https://eslint.org/docs/user-guide/migrating-to-6.0.0#-the-comma-dangle-rule-is-now-more-strict-by-default
+					functions: "ignore",
+				},
+			],
 
-			"no-throw-literal": [ "error" ],
+			"no-throw-literal": ["error"],
 
-			"no-return-assign": [ "error", "always" ],
+			"no-return-assign": ["error", "always"],
 
 			// react
 			//"react/prefer-es6-class": 1,
@@ -137,28 +142,31 @@ export default [
 			"react/react-in-jsx-scope": "off", // https://github.com/jsx-eslint/eslint-plugin-react/blob/master/docs/rules/react-in-jsx-scope.md#when-not-to-use-it
 			"react/jsx-uses-vars": "error", // required by no-unused-imports
 			"react/jsx-filename-extension": 0,
-			"react/jsx-indent": [ "error", "tab", {
-				checkAttributes: true,
-				indentLogicalExpressions: true,
-			} ],
+			"react/jsx-indent": [
+				"error",
+				"tab",
+				{
+					checkAttributes: true,
+					indentLogicalExpressions: true,
+				},
+			],
 			"react-hooks/rules-of-hooks": "error",
 			"react-hooks/exhaustive-deps": "error",
 
 			//"pkg-renaming": "error", // for @emotion
 
-
 			// ==== start the import recommended rules ====
 			// analysis/correctness
 			//'import/no-unresolved': 'error', // not working yet with eslint flat config
-			'import/named': 'error',
+			"import/named": "error",
 			//'import/namespace': 'error', // not working yet with eslint flat config
 			//'import/default': 'error', // not working yet with eslint flat config
-			'import/export': 'error',
+			"import/export": "error",
 
 			// red flags (thus, warnings)
 			//'import/no-named-as-default': 'warn', // not working yet with eslint flat config
 			//'import/no-named-as-default-member': 'warn', // not working yet with eslint flat config
-			'import/no-duplicates': 'warn',
+			"import/no-duplicates": "warn",
 			// ==== end the import recommended rules ====
 		},
 
@@ -170,15 +178,12 @@ export default [
 				node: {
 					// adds mjs to the list. Otherwise we get
 					// "error  Unable to resolve path to module 'apollo-upload-client'  import/no-unresolved"
-					extensions: [ ".js", ".mjs" ],
+					extensions: [".js", ".mjs"],
 				},
 				webpack: {
 					config: {
 						resolve: {
-							modules: [
-								"node_modules",
-								"src",
-							],
+							modules: ["node_modules", "src"],
 						},
 					},
 				},
@@ -197,7 +202,7 @@ export default [
 			"public/app-dynamics/adrum.js",
 
 			"config-builder/**",
-			"cubic-backoffice-types/**"
-		]
-	}
+			"cubic-backoffice-types/**",
+		],
+	},
 ];

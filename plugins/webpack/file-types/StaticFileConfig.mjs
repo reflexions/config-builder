@@ -11,13 +11,11 @@ const staticFileConfig = async ({ config, isProduction, isNode }) => {
 			...config.module,
 
 			rules: [
-				...config.module?.rules ?? [],
+				...(config.module?.rules ?? []),
 
 				{
 					dependency: {
-						not: [
-							"url",
-						],
+						not: ["url"],
 					},
 					exclude: [
 						// scripts
@@ -42,17 +40,16 @@ const staticFileConfig = async ({ config, isProduction, isNode }) => {
 						/\.svg$/,
 					],
 
-					...(
-						useAssetModules
-							? {
-								type: 'asset/resource',
+					...(useAssetModules
+						? {
+								type: "asset/resource",
 								generator: {
-									filename: `asset/${isNode ? 'node' : 'client'}/[name].[contenthash:8][ext]`,
+									filename: `asset/${isNode ? "node" : "client"}/[name].[contenthash:8][ext]`,
 									emit: !isNode,
 									//emit: true,
 								},
 							}
-							: {
+						: {
 								use: [
 									{
 										ident: "static-file-loader",
@@ -65,11 +62,8 @@ const staticFileConfig = async ({ config, isProduction, isNode }) => {
 								],
 
 								// stop Asset Modules from processing your assets again as that would result in asset duplication
-								type: 'javascript/auto',
-							}
-					),
-
-
+								type: "javascript/auto",
+							}),
 				},
 			],
 		},
@@ -77,7 +71,7 @@ const staticFileConfig = async ({ config, isProduction, isNode }) => {
 };
 
 const attachStaticFileConfigCrumb = Symbol("attachStaticFileConfigCrumb");
-const attachStaticFileConfig = async config => {
+const attachStaticFileConfig = async (config) => {
 	const isProduction = getIsProduction();
 	const isNode = getIsNode();
 	return await staticFileConfig({ config, isProduction, isNode });

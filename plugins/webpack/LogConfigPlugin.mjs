@@ -1,7 +1,7 @@
 import { writeFile } from "node:fs/promises";
+import { silentMkdir } from "../../utils/silentMkdir.mjs";
 import { productionSymbol } from "../context-providers/options/Options.mjs";
 import optionsContext from "../context-providers/options/OptionsContext.mjs";
-import { silentMkdir } from "../../utils/silentMkdir.mjs";
 
 /**
  * Adds the constructor name to object values
@@ -10,27 +10,26 @@ import { silentMkdir } from "../../utils/silentMkdir.mjs";
  */
 const jsonStringifyToObjectReplacer = (key, value) => {
 	if (
-		typeof value === 'object'
-		&& value?.constructor?.name
-		&& !['Object', 'Array'].includes(value.constructor.name)
+		typeof value === "object" &&
+		value?.constructor?.name &&
+		!["Object", "Array"].includes(value.constructor.name)
 	) {
 		return sortKeys({
 			...value,
-			"_name": value.constructor.name,
+			_name: value.constructor.name,
 		});
 	}
 	return sortKeys(value);
 };
 
-const sortKeys = obj => {
+const sortKeys = (obj) => {
 	if (obj?.constructor === Array) {
-		return obj.map(i => sortKeys(i))
-	}
-	else if (obj && obj.constructor === Object) {
+		return obj.map((i) => sortKeys(i));
+	} else if (obj && obj.constructor === Object) {
 		return Object.entries(obj)
-			.sort(([a], [b]) => a > b ? 1 : -1)
+			.sort(([a], [b]) => (a > b ? 1 : -1))
 			.reduce((acc, entry) => {
-				acc[ entry[ 0 ] ] = sortKeys(entry[ 1 ]);
+				acc[entry[0]] = sortKeys(entry[1]);
 				return acc;
 			}, {});
 	}
@@ -39,8 +38,8 @@ const sortKeys = obj => {
 
 const logConfigPlugin = async (basePath, config) => {
 	const prodOrDev = optionsContext.getStore().get(productionSymbol)
-		? 'prod'
-		: 'dev';
+		? "prod"
+		: "dev";
 
 	await silentMkdir(basePath);
 
@@ -49,10 +48,16 @@ const logConfigPlugin = async (basePath, config) => {
 		value: RegExp.prototype.toString,
 	});
 
-	await writeFile(`${basePath}/client-${prodOrDev}.config.json`, JSON.stringify(config[ 0 ] ?? "", jsonStringifyToObjectReplacer, '\t'));
-	await writeFile(`${basePath}/server-${prodOrDev}.config.json`, JSON.stringify(config[ 1 ] ?? "", jsonStringifyToObjectReplacer, '\t'));
+	await writeFile(
+		`${basePath}/client-${prodOrDev}.config.json`,
+		JSON.stringify(config[0] ?? "", jsonStringifyToObjectReplacer, "\t"),
+	);
+	await writeFile(
+		`${basePath}/server-${prodOrDev}.config.json`,
+		JSON.stringify(config[1] ?? "", jsonStringifyToObjectReplacer, "\t"),
+	);
 
-	console.info(JSON.stringify({ config }, jsonStringifyToObjectReplacer, '\t'));
+	console.info(JSON.stringify({ config }, jsonStringifyToObjectReplacer, "\t"));
 
 	return config;
 };
