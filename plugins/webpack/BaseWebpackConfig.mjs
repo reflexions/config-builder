@@ -36,11 +36,13 @@ const baseConfig = async ({ isProduction, isNode }) => ({
 	),
 	context: await getHookFnResult(getContextHook, () => "/var/www/html"),
 
+	// https://webpack.js.org/configuration/devtool/
 	// we need sourcemaps to work in 3 different contexts:
 	// - browser. Separate build. Paths are URLs. In dev, this is at PORT+1.
 	// - server in container. E.g. error traces
 	// - server from host. E.g. dev tools connected to port 9229. Paths are filesystem, but filesystems with different mountpoints
-	//     chrome has workspaces, but they don't let you manually specify a mapping and don't work
+	//     chrome has workspaces, but they don't let you manually specify a mapping and don't work, but inline-source-map works.
+	//     Is there a way to use relative paths? Right now they're absolute, so they mismatch between host and container
 	devtool: await getHookFnResult(getDevToolHook, () =>
 		isProduction ? "source-map" : "eval-cheap-module-source-map",
 	),
