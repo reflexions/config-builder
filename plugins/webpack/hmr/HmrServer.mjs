@@ -59,7 +59,6 @@ const attachHmrServer = async (config) => {
 			),
 		].filter((x) => x),
 
-		watch: !isProduction,
 		watchOptions: {
 			ignored: [
 				...getHook(attachHmrServerWatchIgnoreSymbol, ["**/node_modules"]),

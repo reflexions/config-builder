@@ -29,7 +29,7 @@ export default class BrowserDevServerPlugin {
 		// (do not require/import the webpack or any symbols from it directly).
 		const { webpack } = compiler;
 
-		compiler.hooks.afterCompile.tap(pluginName, (compilation) => {
+		compiler.hooks.afterDone.tap(pluginName, (stats) => {
 			if (once) {
 				// there are two parallel compilations using BrowserDevServerPlugin?
 				// without this, we get "Error: listen EADDRINUSE: address already in use 0.0.0.0:81"

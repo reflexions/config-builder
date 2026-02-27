@@ -101,7 +101,6 @@ const attachHmrClient = async (config) =>
 					new BrowserDevServerPlugin(),
 				],
 
-				watch: true,
 				watchOptions: {
 					ignored: [
 						...getHook(attachHmrClientWatchIgnoreSymbol, ["**/node_modules"]),
