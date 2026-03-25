@@ -47,8 +47,8 @@ export default class BrowserDevServerPlugin {
 				}
 			});
 			waitForCleanup.then(async () => {
-				// todo: get this from the compilation's devServer config somehow instead
-				const options = browserDevServerConfig();
+				// Use compiler's devServer so preCompile hooks (e.g. writeToDisk, static dir) are applied
+				const options = compiler.options.devServer ?? browserDevServerConfig();
 
 				// WebpackDevServer API docs: https://webpack.js.org/api/webpack-dev-server/
 				const clientDevServer = (this.clientDevServer = new WebpackDevServer(
