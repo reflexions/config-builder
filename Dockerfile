@@ -23,6 +23,12 @@ RUN $(yarn bin)/eslint .
 # =================================================
 FROM base AS circular-dependency-check
 
+ENV NODE_ENV=development
+
+RUN yarn install \
+	--frozen-lockfile \
+	--non-interactive
+
 RUN $(yarn bin)/madge --circular ./ConfigBuilder.mjs
 
 # todo fix the circular reference found here:
