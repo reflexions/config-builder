@@ -56,7 +56,7 @@ export const browserDevServerConfig = () =>
 			progress: getHook(browserDevServerClientProgressSymbol, true),
 		},
 		devMiddleware: {
-			publicPath: getHmrClientPublicUrl().href,
+			publicPath: getHmrClientPublicUrl().pathname,
 		},
 		static: {
 			watch: getHook(browserDevServerWatchSymbol, {

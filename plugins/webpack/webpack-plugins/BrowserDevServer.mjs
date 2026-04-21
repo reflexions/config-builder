@@ -47,8 +47,8 @@ export default class BrowserDevServerPlugin {
 				}
 			});
 			waitForCleanup.then(async () => {
-				// todo: get this from the compilation's devServer config somehow instead
-				const options = browserDevServerConfig();
+				// Use compiler's devServer so preCompile hooks (e.g. writeToDisk, static dir) are applied
+				const options = compiler.options.devServer ?? browserDevServerConfig();
 
 				// WebpackDevServer API docs: https://webpack.js.org/api/webpack-dev-server/
 				const clientDevServer = (this.clientDevServer = new WebpackDevServer(
@@ -58,6 +58,18 @@ export default class BrowserDevServerPlugin {
 
 				try {
 					await clientDevServer.start();
+
+					// wdm (webpack-dev-middleware) replaces compiler.outputFileSystem with a
+					// fresh memfs during start(). webpack's emit tracking (_assetEmittingWrittenFiles,
+					// _assetEmittingPreviousFiles, _assetEmittingSourceCache) is populated from the
+					// preceding run() build and refers to the old (real) FS. Without resetting it,
+					// webpack's next watch compilation skips re-emitting unchanged chunks because it
+					// thinks they're already written — leaving them absent from the new memfs and
+					// causing 404s for any lazy-loaded chunk that didn't change between run() and
+					// the first watch build.
+					compiler._assetEmittingWrittenFiles = new Map();
+					compiler._assetEmittingPreviousFiles = new Set();
+					compiler._assetEmittingSourceCache = new WeakMap();
 
 					// without this initial invalidation, HMR doesn't start until you make
 					// a code edit. /static/js/client.js will be missing the
