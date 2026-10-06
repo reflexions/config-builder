@@ -24,9 +24,6 @@
 		"./RunPlugins.mjs": "./RunPlugins.mjs",
 		"./otel/BuildTrace.mjs": "./otel/BuildTrace.mjs"
 	},
-	"scripts": {
-		"test": "node --test"
-	},
 	"keywords": [],
 	"author": "Reflexions Data, LLC",
 	"license": "ISC",

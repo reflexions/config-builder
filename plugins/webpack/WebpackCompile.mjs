@@ -35,7 +35,8 @@ const webpackCompile = (configs) => {
 			// throws synchronously on an invalid config or a plugin that fails in apply()
 			compilerRunner = webpack(configs);
 		} catch (error) {
-			trace.flush("failure").then(() => reject(error));
+			trace.flush("failure");
+			reject(error);
 			return;
 		}
 
@@ -76,7 +77,8 @@ const webpackCompile = (configs) => {
 					console.error(configError.details);
 				}
 
-				trace.flush("failure").then(() => reject({ type: "configError", configError }));
+				trace.flush("failure");
+				reject({ type: "configError", configError });
 				return;
 			}
 
@@ -85,7 +87,8 @@ const webpackCompile = (configs) => {
 			if (stats.hasErrors()) {
 				console.error("Webpack reported stats.hasErrors()");
 				console.error(info.errors);
-				trace.flush("failure").then(() => reject({ type: "webpack stats.hasErrors()" }));
+				trace.flush("failure");
+				reject({ type: "webpack stats.hasErrors()" });
 				return;
 			}
 
@@ -95,7 +98,8 @@ const webpackCompile = (configs) => {
 			}
 
 			console.log("Webpack compiled successfully");
-			trace.flush("success").then(() => resolve());
+			trace.flush("success");
+			resolve();
 		});
 	});
 };

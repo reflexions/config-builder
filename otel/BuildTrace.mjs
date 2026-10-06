@@ -31,9 +31,10 @@
  *                                span, e.g. webpack inside a CI build's trace.
  *                                Overrides the `traceId` option.
  *
- * Export is best-effort: `flush()` never throws, so a dead or misconfigured
- * collector can't fail a build. It is awaited, though, so an unreachable
- * collector costs up to the timeout on the way out.
+ * Export is best-effort and silent: `flush()` never throws, so a dead or
+ * misconfigured collector can't fail a build. Callers fire and forget it; the
+ * pending request keeps node alive (up to the timeout) unless the process
+ * exits first, e.g. `process.exit(1)` after a failed build drops that trace.
  */
 
 import { randomBytes } from "node:crypto";
@@ -213,7 +214,7 @@ export const createBuildTrace = ({
 			// config isn't worth failing a build over either
 			// appended, not resolved, so a path-prefixed collector (https://host/otlp) keeps its prefix
 			const url = new URL(`${endpoint.replace(/\/+$/, "")}/v1/traces`);
-			const response = await fetch(url, {
+			await fetch(url, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -222,14 +223,9 @@ export const createBuildTrace = ({
 				body: JSON.stringify(payload),
 				signal: AbortSignal.timeout(timeoutMs),
 			});
-			if (!response.ok) {
-				console.warn(`otel: collector rejected trace (${response.status} ${response.statusText})`);
-				return;
-			}
-			console.log(`otel: exported ${spans.length} spans, trace ${traceId} → ${url.origin}`);
 		}
-		catch (error) {
-			console.warn(`otel: failed to export trace to ${endpoint}`, error);
+		catch {
+			// best-effort: a dead collector must not affect the build
 		}
 	};
 
