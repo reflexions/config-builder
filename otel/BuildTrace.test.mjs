@@ -86,10 +86,12 @@ test("keeps the endpoint's path prefix and survives a bad timeout", async () => 
 	assert.deepEqual(urls, [ "/otlp/v1/traces" ]);
 });
 
-test("an empty endpoint turns export off, no throw", async () => {
+test("an empty endpoint turns export off, no throw", async (t) => {
+	const fetch = t.mock.method(globalThis, "fetch");
 	const trace = createBuildTrace({ name: "x", env: { OTEL_EXPORTER_OTLP_ENDPOINT: "" } });
 	trace.startSpan("a").end();
 	await trace.flush("success");
+	assert.equal(fetch.mock.callCount(), 0);
 });
 
 test("unreachable collector doesn't throw", async () => {
