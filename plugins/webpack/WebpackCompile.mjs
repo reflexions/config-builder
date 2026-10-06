@@ -30,7 +30,14 @@ const webpackCompile = (configs) => {
 		/** @type { import('webpack').default } */
 		const webpack = webpackContext.getStore();
 
-		const compilerRunner = webpack(configs);
+		let compilerRunner;
+		try {
+			// throws synchronously on an invalid config or a plugin that fails in apply()
+			compilerRunner = webpack(configs);
+		} catch (error) {
+			trace.flush("failure").then(() => reject(error));
+			return;
+		}
 
 		// Each sub-compiler fires 'done' when its own compilation finishes
 		(compilerRunner.compilers ?? [ compilerRunner ]).forEach((subCompiler, index) => {

@@ -52,8 +52,17 @@ test("TRACEPARENT nests the root span under the caller's span", () => {
 	assert.equal(child.traceId, parent.traceId);
 	assert.match(child.traceparentFor(), new RegExp(`^00-${parent.traceId}-[0-9a-f]{16}-01$`));
 
-	const junk = createBuildTrace({ name: "x", env: { TRACEPARENT: "garbage" } });
-	assert.match(junk.traceId, /^[0-9a-f]{32}$/);
+	for (const TRACEPARENT of [
+		"garbage",
+		`ff-${parent.traceId}-0123456789abcdef-01`,
+		`00-${"0".repeat(32)}-0123456789abcdef-01`,
+		`00-${parent.traceId}-${"0".repeat(16)}-01`,
+	]) {
+		const junk = createBuildTrace({ name: "x", env: { TRACEPARENT } });
+		assert.match(junk.traceId, /^[0-9a-f]{32}$/);
+		assert.notEqual(junk.traceId, parent.traceId, TRACEPARENT);
+		assert.notEqual(junk.traceId, "0".repeat(32), TRACEPARENT);
+	}
 });
 
 test("keeps the endpoint's path prefix and survives a bad timeout", async () => {

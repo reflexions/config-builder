@@ -107,7 +107,8 @@ export const createBuildTrace = ({
 	// AbortSignal.timeout throws on NaN/negative, which would lose every export
 	const timeoutMs = parsedTimeoutMs > 0 ? parsedTimeoutMs : 10000;
 	serviceName = env.OTEL_SERVICE_NAME || serviceName;
-	const traceparent = /^[0-9a-f]{2}-([0-9a-f]{32})-([0-9a-f]{16})-[0-9a-f]{2}$/
+	// W3C: version ff and all-zero ids are invalid, so ignore them
+	const traceparent = /^(?!ff)[0-9a-f]{2}-(?!0{32})([0-9a-f]{32})-(?!0{16})([0-9a-f]{16})-[0-9a-f]{2}$/
 		.exec(env.TRACEPARENT?.trim().toLowerCase() ?? "");
 	traceId = traceparent?.[1] ?? traceIdFrom(traceId);
 	const rootParentSpanId = traceparent?.[2];
