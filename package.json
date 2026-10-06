@@ -1,6 +1,6 @@
 {
 	"name": "@reflexions/config-builder",
-	"version": "1.6.5",
+	"version": "1.7.0",
 	"description": "Calls plugins to generate and run a config",
 	"repository": {
 		"type": "git",
@@ -21,7 +21,8 @@
 		"./BreadcrumbContext.mjs": "./BreadcrumbContext.mjs",
 		"./ConfigBuilder.mjs": "./ConfigBuilder.mjs",
 		"./PluginSchema.mjs": "./PluginSchema.mjs",
-		"./RunPlugins.mjs": "./RunPlugins.mjs"
+		"./RunPlugins.mjs": "./RunPlugins.mjs",
+		"./otel/BuildTrace.mjs": "./otel/BuildTrace.mjs"
 	},
 	"keywords": [],
 	"author": "Reflexions Data, LLC",
