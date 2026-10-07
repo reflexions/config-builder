@@ -17,10 +17,11 @@ const packageName = () => {
 
 // "webpack browser" / "webpack node" when the config has no name (the default), from its target
 const compilerLabel = (subCompiler, index) => {
+	// NodeConfig's default target is "async-node<major>.<minor>", so match that as well as "node*".
 	// target: false is valid webpack (no target-specific defaults), so it says nothing about browser vs node
 	const { target } = subCompiler.options;
 	const targetText = target === undefined || target === false ? "" : String(target);
-	return subCompiler.name ?? (targetText.startsWith("node") ? "node" : targetText ? "browser" : index);
+	return subCompiler.name ?? (/^(async-)?node/.test(targetText) ? "node" : targetText ? "browser" : index);
 };
 
 const webpackCompile = (configs) => {
