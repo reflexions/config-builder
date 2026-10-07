@@ -33,8 +33,11 @@ const webpackCompile = (configs) => {
 		name: "webpack build",
 		serviceName: "webpack",
 		// SITE / CITY / PHASE are set by the consumers' Dockerfiles and tell repos and sites apart.
-		// Unset values are dropped.
+		// NODE_ENV is "production" in CI image builds and "development" in local docker builds.
+		// CUSTOMER_URL is only set locally (docker.env), where it also names the repo. Unset values are dropped.
 		attributes: {
+			"app.node_env": process.env.NODE_ENV,
+			"customer.url": process.env.CUSTOMER_URL,
 			"app.package": packageName(),
 			"app.site": process.env.SITE,
 			"app.city": process.env.CITY,
