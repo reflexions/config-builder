@@ -32,11 +32,9 @@ const webpackCompile = (configs) => {
 	const trace = createBuildTrace({
 		name: "webpack build",
 		serviceName: "webpack",
-		// unset values are dropped; CUSTOMER_URL / PUBLIC_URL are usually unset in docker builds.
 		// SITE / CITY / PHASE are set by the consumers' Dockerfiles and tell repos and sites apart.
+		// Unset values are dropped.
 		attributes: {
-			"customer.url": process.env.CUSTOMER_URL,
-			"public.url": process.env.PUBLIC_URL,
 			"app.package": packageName(),
 			"app.site": process.env.SITE,
 			"app.city": process.env.CITY,
