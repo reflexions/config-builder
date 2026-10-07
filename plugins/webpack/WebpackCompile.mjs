@@ -17,8 +17,10 @@ const packageName = () => {
 
 // "webpack browser" / "webpack node" when the config has no name (the default), from its target
 const compilerLabel = (subCompiler, index) => {
-	const target = String(subCompiler.options.target ?? "");
-	return subCompiler.name ?? (target.startsWith("node") ? "node" : target ? "browser" : index);
+	// target: false is valid webpack (no target-specific defaults), so it says nothing about browser vs node
+	const { target } = subCompiler.options;
+	const targetText = target === undefined || target === false ? "" : String(target);
+	return subCompiler.name ?? (targetText.startsWith("node") ? "node" : targetText ? "browser" : index);
 };
 
 const webpackCompile = (configs) => {
@@ -69,7 +71,7 @@ const webpackCompile = (configs) => {
 			subCompiler.hooks.compile.tap('BuildTrace', () => {
 				span ??= trace.startSpan(`webpack ${compilerLabel(subCompiler, index)}`, {
 					"webpack.compiler.name": subCompiler.name,
-					"webpack.target": subCompiler.options.target ? String(subCompiler.options.target) : undefined,
+					"webpack.target": subCompiler.options.target === undefined ? undefined : String(subCompiler.options.target),
 				});
 			});
 
