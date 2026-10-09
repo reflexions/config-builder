@@ -1,8 +1,28 @@
+import { readFileSync } from "node:fs";
 import os from "node:os";
 import { getHook } from "../../RunPlugins.mjs";
 import { createBuildTrace } from "../../otel/BuildTrace.mjs";
 import { dryRun } from "../context-providers/options/Options.mjs";
 import webpackContext from "../context-providers/webpack/WebpackContext.mjs";
+
+// The building project's package.json name. build.mjs runs under plain node, so npm_package_name isn't set.
+const packageName = () => {
+	try {
+		return JSON.parse(readFileSync(`${process.cwd()}/package.json`, "utf8")).name;
+	}
+	catch {
+		return undefined;
+	}
+};
+
+// "webpack browser" / "webpack node" when the config has no name (the default), from its target
+const compilerLabel = (subCompiler, index) => {
+	// NodeConfig's default target is "async-node<major>.<minor>", so match that as well as "node*".
+	// target: false is valid webpack (no target-specific defaults), so it says nothing about browser vs node
+	const { target } = subCompiler.options;
+	const targetText = target === undefined || target === false ? "" : String(target);
+	return subCompiler.name ?? (/^(async-)?node/.test(targetText) ? "node" : targetText ? "browser" : index);
+};
 
 const webpackCompile = (configs) => {
 	if (getHook(dryRun)) {
@@ -15,10 +35,16 @@ const webpackCompile = (configs) => {
 	const trace = createBuildTrace({
 		name: "webpack build",
 		serviceName: "webpack",
-		// unset values are dropped; CUSTOMER_URL / PUBLIC_URL are usually unset in docker builds
+		// SITE / CITY / PHASE are set by the consumers' Dockerfiles and tell repos and sites apart.
+		// NODE_ENV is "production" in CI image builds and "development" in local docker builds.
+		// CUSTOMER_URL is only set locally (docker.env), where it also names the repo. Unset values are dropped.
 		attributes: {
+			"app.node_env": process.env.NODE_ENV,
 			"customer.url": process.env.CUSTOMER_URL,
-			"public.url": process.env.PUBLIC_URL,
+			"app.package": packageName(),
+			"app.site": process.env.SITE,
+			"app.city": process.env.CITY,
+			"app.phase": process.env.PHASE,
 			"host.name": os.hostname(),
 			"host.cpu.count": os.cpus().length,
 			"host.memory.total": os.totalmem(),
@@ -44,8 +70,9 @@ const webpackCompile = (configs) => {
 		(compilerRunner.compilers ?? [ compilerRunner ]).forEach((subCompiler, index) => {
 			let span;
 			subCompiler.hooks.compile.tap('BuildTrace', () => {
-				span ??= trace.startSpan(`webpack ${subCompiler.name ?? index}`, {
+				span ??= trace.startSpan(`webpack ${compilerLabel(subCompiler, index)}`, {
 					"webpack.compiler.name": subCompiler.name,
+					"webpack.target": subCompiler.options.target === undefined ? undefined : String(subCompiler.options.target),
 				});
 			});
 

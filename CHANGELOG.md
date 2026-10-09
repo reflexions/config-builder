@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+- Build traces now say which project and site built them: the root span records `app.package` (from `package.json`) and, when set, `app.site` / `app.city` / `app.phase` (`SITE`, `CITY`, `PHASE`, which the consumers' Dockerfiles already set).
+- The root span records `app.node_env` (`NODE_ENV`), so local builds (`development`) and CI image builds (`production`) can be told apart. `customer.url` stays: it's empty in CI but set in local `docker.env`. Removed `public.url`, which is a generic `localhost` locally and unset in CI.
+- Sub-compiler spans are named `webpack browser` / `webpack node` (from the webpack `target`) instead of `webpack 0` / `webpack 1` when the config has no `name`, and record `webpack.target`.
+
 ## [1.7.0] - 2026-10-06
 
 - Added `otel/BuildTrace.mjs`: a dependency-free OTLP/HTTP exporter that records build timings as one trace (root span + child spans) and posts it to the build collector (`https://otel.nycrcubic.com`). The endpoint and its write-only token are baked in, so a consumer only needs to bump this package. `OTEL_EXPORTER_OTLP_ENDPOINT` / `OTEL_INGRESS_BEARER_TOKEN` override them, and an empty endpoint turns export off. Export is best-effort and never fails the build.
