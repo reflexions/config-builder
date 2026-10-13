@@ -5,6 +5,7 @@
 - Build traces now say which project and site built them: the root span records `app.package` (from `package.json`) and, when set, `app.site` / `app.city` / `app.phase` (`SITE`, `CITY`, `PHASE`, which the consumers' Dockerfiles already set).
 - The root span records `app.node_env` (`NODE_ENV`), so local builds (`development`) and CI image builds (`production`) can be told apart. `customer.url` stays: it's empty in CI but set in local `docker.env`. Removed `public.url`, which is a generic `localhost` locally and unset in CI.
 - Sub-compiler spans are named `webpack browser` / `webpack node` (from the webpack `target`) instead of `webpack 0` / `webpack 1` when the config has no `name`, and record `webpack.target`.
+- Fixed the `./plugins/webpack/hmr/HmrClient.mjs` and `./plugins/webpack/hmr/HmrServer.mjs` package exports: they pointed at `./plugins/hmr/`, which no longer exists, so importing them from the package failed with `ERR_MODULE_NOT_FOUND`.
 
 ## [1.7.0] - 2026-10-06
 
