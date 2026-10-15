@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+- Fixed: in development the node (server) build rebuilds on change again. Since 1.6.3 `WebpackCompile` used `compiler.run()`, which builds once and ignores `watch`, so server-only edits (resolvers, `ExpressServer.js`) needed a container restart and SSR could render stale code. After the first build, dev now calls `.watch()` on the node sub-compiler only, with its `watchOptions` from `HmrServer`. webpack-dev-server still owns the browser build. Rebuild errors are still printed, and rebuilds don't send build traces (only the first build does). Production is unchanged: one run, then exit.
 - Build traces now say which project and site built them: the root span records `app.package` (from `package.json`) and, when set, `app.site` / `app.city` / `app.phase` (`SITE`, `CITY`, `PHASE`, which the consumers' Dockerfiles already set).
 - The root span records `app.node_env` (`NODE_ENV`), so local builds (`development`) and CI image builds (`production`) can be told apart. `customer.url` stays: it's empty in CI but set in local `docker.env`. Removed `public.url`, which is a generic `localhost` locally and unset in CI.
 - Sub-compiler spans are named `webpack browser` / `webpack node` (from the webpack `target`) instead of `webpack 0` / `webpack 1` when the config has no `name`, and record `webpack.target`.

@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import os from "node:os";
 import { getHook } from "../../RunPlugins.mjs";
 import { createBuildTrace } from "../../otel/BuildTrace.mjs";
-import { dryRun } from "../context-providers/options/Options.mjs";
+import { dryRun, getIsProduction } from "../context-providers/options/Options.mjs";
 import webpackContext from "../context-providers/webpack/WebpackContext.mjs";
 
 // The building project's package.json name. build.mjs runs under plain node, so npm_package_name isn't set.
@@ -28,6 +28,9 @@ const webpackCompile = (configs) => {
 	if (getHook(dryRun)) {
 		return configs;
 	}
+
+	// read now: the async context may not survive into webpack's callbacks
+	const isProduction = getIsProduction();
 
 	// One span per sub-compiler (browser, node) under a "webpack build" root.
 	// Sent to the baked-in build collector (see otel/BuildTrace.mjs); OTEL_EXPORTER_OTLP_ENDPOINT="" turns it off.
@@ -66,8 +69,10 @@ const webpackCompile = (configs) => {
 			return;
 		}
 
+		const subCompilers = compilerRunner.compilers ?? [ compilerRunner ];
+
 		// Each sub-compiler fires 'done' when its own compilation finishes
-		(compilerRunner.compilers ?? [ compilerRunner ]).forEach((subCompiler, index) => {
+		subCompilers.forEach((subCompiler, index) => {
 			let span;
 			subCompiler.hooks.compile.tap('BuildTrace', () => {
 				span ??= trace.startSpan(`webpack ${compilerLabel(subCompiler, index)}`, {
@@ -126,6 +131,19 @@ const webpackCompile = (configs) => {
 
 			console.log("Webpack compiled successfully");
 			trace.flush("success");
+
+			// run() ignores config.watch, so in dev watch the node build ourselves.
+			// The browser build is watched by webpack-dev-server (BrowserDevServerPlugin); watching it here too races with it.
+			// Rebuilds reuse the taps above: errors still print, and the span is already ended and flushed, so no new trace.
+			const nodeCompiler = subCompilers.find((subCompiler, index) => compilerLabel(subCompiler, index) === "node");
+			if (!isProduction && nodeCompiler) {
+				nodeCompiler.watch(nodeCompiler.options.watchOptions ?? {}, (watchError) => {
+					if (watchError) {
+						console.error(watchError.stack || watchError);
+					}
+				});
+			}
+
 			resolve();
 		});
 	});
