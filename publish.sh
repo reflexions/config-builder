@@ -21,7 +21,7 @@ fi
 
 # bump the version for npm
 echo "What type of update is this?"
-echo "Options are: A/1 (major), I/2 (minor), P/3 (patch)"
+echo "Options are: A/1 (major), I/2 (minor), P/3 (patch), K/0 (keep current version)"
 
 read -p "Type: " -n 1 -r
 echo ''
@@ -33,8 +33,11 @@ elif [[ $REPLY =~ ^[Ii2]$ ]]; then
 	version=$(npm version minor)
 elif [[ $REPLY =~ ^[Pp3]$ ]]; then
 	version=$(npm version patch)
+elif [[ $REPLY =~ ^[Kk0]$ ]]; then
+	# package.json's version was already bumped by hand
+	version="v$(npm pkg get version | tr -d '"')"
 else
-	echo "Invalid option provided as update type. Valid options are: A, I, P."
+	echo "Invalid option provided as update type. Valid options are: A, I, P, K."
 	exit 1
 fi
 
